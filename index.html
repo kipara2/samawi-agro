@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Samawi Agro - Marketplace</title>
+    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .active-tab { border-top: 4px solid #16a34a; color: #16a34a; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans pb-20">
+
+    <header class="bg-green-700 text-white p-4 sticky top-0 z-50 shadow-md">
+        <div class="flex justify-between items-center">
+            <h1 class="text-xl font-bold italic">Samawi Agro</h1>
+            <button onclick="showSection('admin')" class="bg-green-600 px-3 py-1 rounded text-sm">Admin</button>
+        </div>
+    </header>
+
+    <main id="content" class="p-4">
+        
+        <section id="home-section">
+            <div class="bg-green-100 p-4 rounded-lg mb-6 text-green-800">
+                <h2 class="font-bold">Karibu Sokoni!</h2>
+                <p class="text-sm">Nunua bidhaa za kilimo kwa kutumia Pi sasa.</p>
+            </div>
+            <div id="product-list" class="grid grid-cols-2 gap-4">
+                </div>
+        </section>
+
+        <section id="wallet-section" class="hidden">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-green-200 text-center">
+                <p class="text-gray-500">Salio la Pi (Testnet)</p>
+                <h3 class="text-3xl font-bold text-green-700">50.00 π</h3>
+                <div class="mt-4 flex gap-2">
+                    <button class="flex-1 bg-green-700 text-white py-2 rounded-lg">Deposit</button>
+                    <button class="flex-1 border border-green-700 text-green-700 py-2 rounded-lg">History</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="admin-section" class="hidden">
+            <h2 class="font-bold text-lg mb-4">Weka Bidhaa Mpya</h2>
+            <div class="bg-white p-4 rounded-lg shadow space-y-3">
+                <input type="text" id="p-name" placeholder="Jina la zao (mf: Nyanya)" class="w-full p-2 border rounded">
+                <input type="number" id="p-price" placeholder="Bei (Pi)" class="w-full p-2 border rounded">
+                <input type="text" id="p-img" placeholder="Link ya Picha" class="w-full p-2 border rounded">
+                <button onclick="addProduct()" class="w-full bg-green-700 text-white py-2 rounded">Ongeza Bidhaa</button>
+            </div>
+        </section>
+
+    </main>
+
+    <nav class="fixed bottom-0 w-full bg-white border-t border-gray-200 flex justify-around p-2 text-gray-500">
+        <button onclick="showSection('home')" id="home-btn" class="flex flex-col items-center active-tab">
+            <span class="text-xs">Nyumbani</span>
+        </button>
+        <button onclick="showSection('wallet')" id="wallet-btn" class="flex flex-col items-center">
+            <span class="text-xs">Wallet</span>
+        </button>
+        <button onclick="showSection('profile')" class="flex flex-col items-center">
+            <span class="text-xs">Profile</span>
+        </button>
+    </nav>
+
+    <script>
+        // Initialization ya Pi SDK
+        const Pi = window.Pi;
+        Pi.init({ version: "2.0", sandbox: true });
+
+        // Bidhaa za mwanzo
+        let products = JSON.parse(localStorage.getItem('samawi_products')) || [
+            { name: "Mahindi Ghalani", price: 2.5, img: "https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=200" },
+            { name: "Mbolea ya DAP", price: 10.0, img: "https://images.unsplash.com/photo-1628352081506-83c43123ed6d?w=200" }
+        ];
+
+        function renderProducts() {
+            const list = document.getElementById('product-list');
+            list.innerHTML = products.map(p => `
+                <div class="bg-white p-2 rounded shadow-sm">
+                    <img src="${p.img}" class="w-full h-24 object-cover rounded mb-2">
+                    <h3 class="font-bold text-sm">${p.name}</h3>
+                    <p class="text-green-700 font-bold">${p.price} π</p>
+                    <button onclick="payWithPi('${p.name}', ${p.price})" class="w-full bg-green-600 text-white text-xs py-1 mt-2 rounded">Nunua</button>
+                </div>
+            `).join('');
+        }
+
+        function addProduct() {
+            const name = document.getElementById('p-name').value;
+            const price = document.getElementById('p-price').value;
+            const img = document.getElementById('p-img').value;
+            if(name && price) {
+                products.push({ name, price, img: img || 'https://via.placeholder.com/200' });
+                localStorage.setItem('samawi_products', JSON.stringify(products));
+                alert("Bidhaa imeongezwa!");
+                showSection('home');
+            }
+        }
+
+        function showSection(id) {
+            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(id + '-section').classList.remove('hidden');
+            renderProducts();
+        }
+
+        async function payWithPi(name, amount) {
+            try {
+                const payment = await Pi.createPayment({
+                    amount: amount,
+                    memo: "Kununua " + name + " kutoka Samawi Agro",
+                    metadata: { productId: name }
+                }, {
+                    onReadyForServerApproval: (paymentId) => { console.log("Approval pending..."); },
+                    onReadyForServerCompletion: (paymentId, txid) => { console.log("Transaction ID: ", txid); },
+                    onCancel: (paymentId) => { alert("Umesitisha malipo."); },
+                    onError: (error, payment) => { console.error(error); }
+                });
+            } catch (err) {
+                alert("Fungua app hii ndani ya Pi Browser kufanya malipo!");
+            }
+        }
+
+        renderProducts();
+    </script>
+</body>
+</html>
