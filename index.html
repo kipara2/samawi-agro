@@ -3,261 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAMAWI AGRO | Full Marketplace</title>
+    <title>SAMAWI AGRO | Go Live</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #2e7d32; --accent: #ff6f00; --bg: #f4f7f6; }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); padding-bottom: 80px; }
+        :root { --primary: #1a5e20; --pi-gold: #ffa000; --bg: #f8f9fa; }
+        body { font-family: 'Poppins', sans-serif; margin: 0; background: var(--bg); padding-bottom: 80px; }
         
-        /* Header */
         header { 
-            background: white; padding: 15px; display: flex; justify-content: space-between; 
-            align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000;
+            background: #fff; padding: 15px; display: flex; justify-content: space-between; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000;
         }
-        .logo { font-size: 1.4rem; font-weight: 800; color: var(--primary); }
-        .cart-icon { position: relative; cursor: pointer; font-size: 1.2rem; }
-        #cart-count { 
-            position: absolute; top: -10px; right: -10px; background: red; color: white; 
-            font-size: 0.7rem; padding: 2px 6px; border-radius: 50%; 
-        }
+        .logo { font-weight: 800; color: var(--primary); font-size: 1.2rem; }
 
-        /* Navigation Pages */
-        .page { display: none; padding: 15px; animation: fadeIn 0.3s ease; }
-        .active-page { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* Soko Grid */
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-        .card img { width: 100%; height: 120px; object-fit: cover; }
-        .card-info { padding: 10px; }
-        .p-price { color: var(--primary); font-weight: 800; margin: 5px 0; }
-        .btn-add { width: 100%; background: var(--primary); color: white; border: none; padding: 8px; border-radius: 6px; cursor: pointer; }
-
-        /* Cart Styles */
-        .cart-item { 
-            background: white; padding: 10px; border-radius: 10px; margin-bottom: 10px; 
-            display: flex; align-items: center; gap: 10px; 
-        }
-        .cart-item img { width: 50px; height: 50px; border-radius: 5px; object-fit: cover; }
-        .cart-details { flex: 1; }
-        .btn-remove { color: red; border: none; background: none; cursor: pointer; }
-
-        /* Total Section */
-        .checkout-box { 
-            background: white; padding: 20px; border-radius: 15px; margin-top: 20px; 
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        /* Wallet Section */
+        .wallet-card {
+            background: linear-gradient(135deg, #6200ee, #3700b3);
+            color: white; padding: 20px; border-radius: 15px; margin: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
-        /* Wallet Card */
-        .wallet-card { 
-            background: linear-gradient(45deg, #2e7d32, #1b5e20); color: white; 
-            padding: 25px; border-radius: 15px; text-align: center; margin-bottom: 20px;
+        /* Categories */
+        .cat-scroll {
+            display: flex; gap: 10px; overflow-x: auto; padding: 10px 15px;
+            scrollbar-width: none;
         }
+        .cat-btn {
+            background: white; border: 1px solid #ddd; padding: 8px 20px;
+            border-radius: 20px; white-space: nowrap; cursor: pointer;
+        }
+        .cat-btn.active { background: var(--primary); color: white; border: none; }
+
+        /* Grid */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px; }
+        .card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .card img { width: 100%; height: 110px; object-fit: cover; }
+        .card-body { padding: 10px; }
+        .p-price { color: var(--primary); font-weight: bold; font-size: 0.9rem; }
+        .pi-price { color: var(--pi-gold); font-weight: bold; font-size: 0.8rem; display: block; margin-top: 4px; }
 
         /* Bottom Nav */
         nav { 
             position: fixed; bottom: 0; width: 100%; background: white; display: flex; 
-            justify-content: space-around; padding: 12px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); 
+            justify-content: space-around; padding: 12px 0; border-top: 1px solid #eee;
         }
-        .nav-link { text-align: center; color: #777; cursor: pointer; font-size: 0.75rem; }
+        .nav-link { text-align: center; color: #666; font-size: 0.7rem; cursor: pointer; }
         .nav-link.active { color: var(--primary); font-weight: bold; }
-        .nav-link i { font-size: 1.4rem; display: block; margin-bottom: 3px; }
 
         .hidden { display: none; }
+        .btn-buy { width: 100%; background: var(--primary); color: white; border: none; padding: 8px; border-radius: 5px; margin-top: 8px; }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo">SAMAWI <span>AGRO</span></div>
-        <div class="cart-icon" onclick="showPage('cart')">
-            <i class="fas fa-shopping-basket"></i>
-            <span id="cart-count">0</span>
-        </div>
+        <div class="logo">SAMAWI AGRO</div>
+        <div onclick="showPage('cart')">🛒 <span id="cart-count">0</span></div>
     </header>
 
-    <div id="home" class="page active-page">
-        <h3 style="margin-top:0">Soko la Mazao & Mifugo</h3>
+    <div id="home" class="page active">
+        <div class="wallet-card">
+            <p style="margin:0; opacity:0.8; font-size:0.8rem;">Salio la Pi (GCV)</p>
+            <h2 id="balance-pi" style="margin:5px 0;">314,159.00 Pi</h2>
+            <p style="margin:0; font-size:0.7rem;">Value: $314,159 per Pi</p>
+        </div>
+
+        <div class="cat-scroll">
+            <div class="cat-btn active" onclick="filter('Zote')">Zote</div>
+            <div class="cat-btn" onclick="filter('Chakula')">Chakula</div>
+            <div class="cat-btn" onclick="filter('Biashara')">Biashara</div>
+            <div class="cat-btn" onclick="filter('Mifugo')">Mifugo</div>
+        </div>
+
         <div id="product-grid" class="grid"></div>
     </div>
 
-    <div id="cart" class="page">
+    <div id="cart" class="page hidden" style="padding:15px;">
         <h3>Kikapu Chako</h3>
-        <div id="cart-items-list">
+        <div id="cart-items"></div>
+        <div style="background:white; padding:20px; border-radius:10px; margin-top:20px;">
+            <div style="display:flex; justify-content:space-between">
+                <span>Jumla (USD):</span>
+                <strong id="total-usd">$0</strong>
             </div>
-        <div id="empty-cart-msg" style="text-align:center; padding: 50px 0; color: #999;">
-            <i class="fas fa-shopping-cart fa-3x"></i>
-            <p>Kikapu chako kipo wazi</p>
-        </div>
-        <div class="checkout-box" id="checkout-box">
-            <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
-                <span>Jumla ya Malipo:</span>
-                <strong id="cart-total">Tsh 0</strong>
+            <div style="display:flex; justify-content:space-between; color:var(--pi-gold); margin-top:10px;">
+                <span>Jumla (Pi GCV):</span>
+                <strong id="total-pi">0 Pi</strong>
             </div>
-            <button class="btn-add" style="padding:15px; font-size:1rem;" onclick="processCheckout()">LIPA NA CHECKOUT</button>
-        </div>
-    </div>
-
-    <div id="wallet" class="page">
-        <div class="wallet-card">
-            <p>Salio la Samawi Wallet</p>
-            <h1 id="balance-display">Tsh 500,000</h1>
-            <button style="padding: 10px 20px; border-radius: 20px; border: none; font-weight: bold;">ONGEZA SALIO</button>
-        </div>
-        <h3>Miamala ya Hivi Karibuni</h3>
-        <div id="transaction-list">
-            <p style="color:#999; font-size:0.9rem">Hakuna miamala bado.</p>
-        </div>
-    </div>
-
-    <div id="profile" class="page">
-        <div style="text-align:center; margin-bottom:30px;">
-            <div style="width:70px; height:70px; background:#ccc; border-radius:50%; margin: 0 auto; display:flex; align-items:center; justify-content:center; font-size:1.5rem">👤</div>
-            <h4>Chief Architect</h4>
-            <p style="color:#777; font-size:0.8rem">ID: SAM-2026-001</p>
-        </div>
-        <div style="background:white; border-radius:10px; padding:10px">
-            <div style="padding:15px; border-bottom:1px solid #eee">Order Zangu</div>
-            <div style="padding:15px; border-bottom:1px solid #eee">Anuani ya Uwasilishaji</div>
-            <div style="padding:15px; color:red">Ondoka (Logout)</div>
+            <button class="btn-buy" style="background:var(--pi-gold); padding:15px; font-weight:bold;" onclick="onPiPayment()">LIPA NA PI NETWORK</button>
         </div>
     </div>
 
     <nav>
-        <div class="nav-link active" onclick="showPage('home', this)">
-            <i class="fas fa-store"></i><span>Soko</span>
-        </div>
-        <div class="nav-link" onclick="showPage('cart', this)">
-            <i class="fas fa-shopping-bag"></i><span>Kikapu</span>
-        </div>
-        <div class="nav-link" onclick="showPage('wallet', this)">
-            <i class="fas fa-wallet"></i><span>Wallet</span>
-        </div>
-        <div class="nav-link" onclick="showPage('profile', this)">
-            <i class="fas fa-user"></i><span>Profile</span>
-        </div>
+        <div class="nav-link active" onclick="showPage('home')"><i class="fas fa-home"></i><br>Soko</div>
+        <div class="nav-link" onclick="showPage('cart')"><i class="fas fa-shopping-cart"></i><br>Kikapu</div>
+        <div class="nav-link"><i class="fas fa-wallet"></i><br>Wallet</div>
+        <div class="nav-link"><i class="fas fa-user"></i><br>Profile</div>
     </nav>
 
+    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+    
     <script>
-        // Database ya Mazao 100+
-        const rawProducts = [
-            { id: 1, name: "Mahindi (Gunia)", cat: "Chakula", price: 85000, img: "https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=200" },
-            { id: 2, name: "Mchele Kyela (1kg)", cat: "Chakula", price: 3200, img: "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=200" },
-            { id: 3, name: "Mbuzi wa Kisasa", cat: "Mifugo", price: 150000, img: "https://images.unsplash.com/photo-1524024973431-2ad916746881?w=200" },
-            { id: 4, name: "Kahawa (Robusta)", cat: "Biashara", price: 12000, img: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=200" },
-            { id: 5, name: "Kuku wa Kienyeji", cat: "Mifugo", price: 20000, img: "https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?w=200" }
+        // 1. ANGAanisha PIA (Pi Network SDK Setup)
+        Pi.init({ version: "2.0", sandbox: true }); // Weka sandbox: false wakati unaruka hewani
+
+        const GCV = 314159; // Thamani ya Pi 1 (GCV)
+
+        // 2. MIFUGO NA MAZAO KWA PICHA HALISI
+        const items = [
+            // CHAKULA
+            { name: "Gunia la Mahindi", cat: "Chakula", price: 50, img: "image_3.png" }, // Picha halisi ya shamba la mahindi
+            { name: "Mchele Kyela (1kg)", cat: "Chakula", price: 1.5, img: "image_5.png" }, // Picha halisi ya kilimo cha mpunga
+            { name: "Mihogo", cat: "Chakula", price: 10, img: "image_7.png" }, // Picha halisi ya mavuno ya mihogo
+            { name: "Maharage Maharage", cat: "Chakula", price: 20, img: "image_9.png" }, // Picha halisi ya shamba la maharage
+            { name: "Viazi Tamu", cat: "Chakula", price: 8, img: "image_13.png" }, // Picha halisi ya mmea wa viazi tamu
+            // BIASHARA
+            { name: "Kahawa (Ghafi)", cat: "Biashara", price: 120, img: "image_17.png" }, // Picha halisi ya kukausha kahawa
+            { name: "Alizeti", cat: "Biashara", price: 70, img: "image_15.png" }, // Picha halisi ya shamba la alizeti
+            { name: "Korosho", cat: "Biashara", price: 250, img: "image_19.png" }, // Picha halisi ya mkorosho na matunda
+            { name: "Ufuta", cat: "Biashara", price: 90, img: "image_21.png" }, // Picha halisi ya kilimo cha ufuta
+            { name: "Pamba", cat: "Biashara", price: 40, img: "image_23.png" }, // Picha halisi ya shamba la pamba
+            // MIFUGO
+            { name: "Ng'ombe wa Boran", cat: "Mifugo", price: 800, img: "image_27.png" }, // Picha halisi ya dume la ng'ombe la Boran
+            { name: "Ng'ombe wa Zebu", cat: "Mifugo", price: 500, img: "image_29.png" }, // Picha halisi ya ng'ombe wa Zebu
+            { name: "Mbuzi wa Masaii", cat: "Mifugo", price: 150, img: "image_31.png" }, // Picha halisi ya kundi la mbuzi
+            { name: "Kuku wa Kienyeji", cat: "Mifugo", price: 20, img: "image_33.png" }, // Picha halisi ya kuku wa kienyeji
+            { name: "Samaki wa Sato (Kilo)", cat: "Mifugo", price: 15, img: "image_35.png" } // Picha halisi ya kufuga samaki
         ];
 
-        // Kuongeza mazao hadi 100
-        for(let i=6; i<=105; i++) {
-            rawProducts.push({
-                id: i,
-                name: i % 2 == 0 ? "Zao la Biashara "+i : "Zao la Chakula "+i,
-                cat: i % 2 == 0 ? "Biashara" : "Chakula",
-                price: Math.floor(Math.random() * 90000) + 1500,
-                img: "https://via.placeholder.com/200?text=Zao+"+i
-            });
-        }
-
         let cart = [];
-        let balance = 500000;
 
-        function showPage(pageId, element) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
-            document.getElementById(pageId).classList.add('active-page');
-            
-            if(element) {
-                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-                element.classList.add('active');
-            }
-            if(pageId === 'cart') renderCart();
-        }
-
-        function renderProducts() {
+        function render(data = items) {
             const grid = document.getElementById('product-grid');
-            grid.innerHTML = rawProducts.map(p => `
-                <div class="card">
-                    <img src="${p.img}">
-                    <div class="card-info">
-                        <p class="p-name">${p.name}</p>
-                        <p class="p-price">Tsh ${p.price.toLocaleString()}</p>
-                        <button class="btn-add" onclick="addToCart(${p.id})">Weka Kikapuni</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function addToCart(productId) {
-            const product = rawProducts.find(p => p.id === productId);
-            cart.push(product);
-            updateCartUI();
-            alert(`${product.name} imeongezwa!`);
-        }
-
-        function updateCartUI() {
-            document.getElementById('cart-count').innerText = cart.length;
-        }
-
-        function renderCart() {
-            const list = document.getElementById('cart-items-list');
-            const emptyMsg = document.getElementById('empty-cart-msg');
-            const checkoutBox = document.getElementById('checkout-box');
-            
-            if(cart.length === 0) {
-                list.innerHTML = "";
-                emptyMsg.classList.remove('hidden');
-                checkoutBox.classList.add('hidden');
-                return;
-            }
-
-            emptyMsg.classList.add('hidden');
-            checkoutBox.classList.remove('hidden');
-            
-            let total = 0;
-            list.innerHTML = cart.map((item, index) => {
-                total += item.price;
+            grid.innerHTML = data.map(p => {
+                let piPrice = (p.price / GCV).toFixed(8); // Hesabu ya Pi (Product Price ÷ GCV)
                 return `
-                    <div class="cart-item">
-                        <img src="${item.image || item.img}">
-                        <div class="cart-details">
-                            <div style="font-weight:bold">${item.name}</div>
-                            <div style="color:var(--primary)">Tsh ${item.price.toLocaleString()}</div>
+                    <div class="card">
+                        <img src="${p.img}" alt="${p.name}">
+                        <div class="card-body">
+                            <p style="margin:0; font-size:0.8rem; font-weight:bold;">${p.name}</p>
+                            <span class="p-price">$${p.price}</span>
+                            <span class="pi-price">${piPrice} Pi</span>
+                            <button class="btn-buy" onclick="addToCart('${p.name}', ${p.price})">Nunua</button>
                         </div>
-                        <button class="btn-remove" onclick="removeFromCart(${index})"><i class="fas fa-trash"></i></button>
                     </div>
                 `;
             }).join('');
-            
-            document.getElementById('cart-total').innerText = "Tsh " + total.toLocaleString();
         }
 
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            renderCart();
-            updateCartUI();
+        // --- Kazi za Cart ---
+        function addToCart(name, price) {
+            cart.push({name, price});
+            document.getElementById('cart-count').innerText = cart.length;
+            alert(name + " imeongezwa kwenye kikapu!");
         }
 
-        function processCheckout() {
-            let total = cart.reduce((sum, item) => sum + item.price, 0);
+        function renderCart() {
+            const container = document.getElementById('cart-items');
+            let totalUsd = 0;
+            container.innerHTML = cart.map(i => {
+                totalUsd += i.price;
+                return `<div style="background:white; padding:10px; margin-bottom:5px; border-radius:5px;">${i.name} - $${i.price}</div>`;
+            }).join('');
             
-            if(balance < total) {
-                alert("Salio lako halitoshi kwenye Wallet!");
-                return;
-            }
+            document.getElementById('total-usd').innerText = "$" + totalUsd;
+            document.getElementById('total-pi').innerText = (totalUsd / GCV).toFixed(8) + " Pi";
+        }
 
-            if(confirm(`Unahitaji kulipa Tsh ${total.toLocaleString()}?`)) {
-                balance -= total;
-                document.getElementById('balance-display').innerText = "Tsh " + balance.toLocaleString();
+        // --- 3. UNGAanisha MALIPO YA PI (Pi Payment Integration) ---
+        async function onPiPayment() {
+            if(cart.length === 0) return alert("Kikapu kipo wazi!");
+            const totalUsd = cart.reduce((sum, item) => sum + item.price, 0);
+            const totalPi = (totalUsd / GCV).toFixed(8);
+
+            try {
+                // Hii inafungua dirisha la malipo kwenye Pi Browser
+                const payment = await Pi.createPayment({
+                    amount: totalPi,
+                    memo: "Malipo ya Mazao/Mifugo kutoka Samawi Agro",
+                    metadata: { cartItems: cart.map(i => i.name).join(', ') }
+                });
+
+                // Malipo yakifanikiwa
+                alert("Hongera! Malipo yako ya " + totalPi + " Pi yamepokelewa.");
                 cart = [];
-                updateCartUI();
-                alert("Malipo yamefanikiwa! Order yako inashughulikiwa.");
                 showPage('home');
+                
+                // Hapa unaweza kuongeza code ya ku-post malipo kwenye backend yako
+                console.log("Pi Payment Successful:", payment);
+
+            } catch (error) {
+                // Malipo yakishindwa
+                alert("Malipo yameshindwa: " + error.message);
+                console.error("Pi Payment Error:", error);
             }
         }
 
-        // Kuanza app
-        renderProducts();
+        // --- Kazi za General ---
+        function showPage(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            if(id === 'cart') renderCart();
+        }
+
+        render();
     </script>
 </body>
 </html>
