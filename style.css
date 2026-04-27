@@ -4,7 +4,6 @@ body {
   background: #f5f5f5;
 }
 
-/* Screens */
 .screen {
   display: none;
   padding: 15px;
@@ -15,43 +14,24 @@ body {
   display: block;
 }
 
-/* Search */
-.search {
-  width: 100%;
-  padding: 10px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-}
-
-/* Products */
-.products {
-  margin-top: 15px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
 .card {
   background: white;
   padding: 10px;
+  margin: 10px 0;
   border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-/* Bottom nav */
 .bottom-nav {
   position: fixed;
   bottom: 0;
   width: 100%;
-  background: white;
   display: flex;
-  border-top: 1px solid #ddd;
+  background: white;
 }
 
 .bottom-nav button {
   flex: 1;
-  padding: 12px;
+  padding: 10px;
   border: none;
   background: none;
-  font-size: 18px;
 }
