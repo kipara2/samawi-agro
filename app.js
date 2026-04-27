@@ -1,76 +1,69 @@
-// NAVIGATION
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+// Data ya mfano (Hapa ndipo tuta-connect na Firebase baadaye)
+let products = [
+    { id: 1, name: "Mahindi Safi", price: 85000, img: "https://via.placeholder.com/150", desc: "Gunia la kilo 100" },
+    { id: 2, name: "Mbuzi wa Nyama", price: 120000, img: "https://via.placeholder.com/150", desc: "Mbuzi bora kutoka Dodoma" }
+];
+
+// 1. Kazi ya kubadilisha kurasa (Home, Wallet, Admin)
+function switchSection(sectionId) {
+    document.querySelectorAll('main section').forEach(section => {
+        section.classList.add('hidden');
+    });
+    document.getElementById(sectionId).classList.remove('hidden');
+    
+    // Update active nav icon
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    event.currentTarget.classList.add('active');
 }
 
-// DATA YAKO
-const data = {
-  kilimo_data: {
-    mazao_ya_chakula: [
-      {id: 1, jina: "Mchele Supa", bei_kilo: 2800, kipimo: "Kg", hali: "Inapanda"},
-      {id: 2, jina: "Mahindi", bei_kilo: 850, kipimo: "Kg", hali: "Inatulia"}
-    ],
-    mazao_ya_biashara: [
-      {id: 5, jina: "Alizeti", bei_kilo: 1350, kipimo: "Kg", hali: "Inapanda"}
-    ],
-    mifugo: [
-      {id: 8, jina: "Ng'ombe", bei_wastani: 950000, kipimo: "Kichwa", hali: "Inapanda"}
-    ]
-  }
-};
-
-// LOAD PRODUCTS
-function loadProducts() {
-  const home = document.getElementById("homeProducts");
-  const market = document.getElementById("marketProducts");
-
-  home.innerHTML = "";
-  market.innerHTML = "";
-
-  const all = [
-    ...data.kilimo_data.mazao_ya_chakula,
-    ...data.kilimo_data.mazao_ya_biashara,
-    ...data.kilimo_data.mifugo
-  ];
-
-  all.forEach(item => {
-    let price = item.bei_kilo || item.bei_wastani;
-
-    const card = `
-      <div class="card">
-        <h3>${item.jina}</h3>
-        <p>Tsh ${price}</p>
-        <button onclick="addToCart('${item.jina}', ${price})">Add</button>
-      </div>
-    `;
-
-    home.innerHTML += card;
-    market.innerHTML += card;
-  });
+// 2. Kazi ya kuonesha bidhaa kwenye Soko (Home)
+function renderProducts() {
+    const grid = document.getElementById('product-grid');
+    grid.innerHTML = ""; // Safisha kwanza
+    
+    products.forEach(p => {
+        grid.innerHTML += `
+            <div class="product-card">
+                <img src="${p.img}" alt="${p.name}">
+                <div class="p-info">
+                    <p class="p-name">${p.name}</p>
+                    <p class="p-price">Tsh ${p.price.toLocaleString()}</p>
+                    <button class="btn-buy" onclick="addToCart(${p.id})">Nunua</button>
+                </div>
+            </div>
+        `;
+    });
 }
 
-// CART
-let cart = [];
+// 3. Kazi ya kupakia picha na bidhaa mpya (Real Upload Logic)
+function uploadProduct() {
+    const name = document.getElementById('p-name').value;
+    const price = document.getElementById('p-price').value;
+    const desc = document.getElementById('p-desc').value;
+    const file = document.getElementById('file-input').files[0];
 
-function addToCart(name, price) {
-  cart.push({name, price});
-  renderCart();
+    if(!name || !price || !file) {
+        alert("Tafadhali jaza picha, jina na bei!");
+        return;
+    }
+
+    // KWA SASA (Maelekezo): Hapa tutaweka code za Firebase ku-upload.
+    // Kwa sasa tunaongeza kwenye list ya hapa hapa kuona inavyofanya kazi.
+    
+    const newProduct = {
+        id: products.length + 1,
+        name: name,
+        price: parseInt(price),
+        img: URL.createObjectURL(file), // Hii inasoma picha uliyopiga sasa hivi
+        desc: desc
+    };
+
+    products.unshift(newProduct); // Inaweka juu kabisa ya list
+    renderProducts(); // Inatokea kwenye soko sekunde hiyo hiyo
+    
+    alert("Hongera! Bidhaa imewekwa sokoni.");
+    switchSection('home-section'); // Kurudi sokoni
 }
 
-function renderCart() {
-  const box = document.getElementById("cartItems");
-  let total = 0;
-
-  box.innerHTML = "";
-
-  cart.forEach(i => {
-    total += i.price;
-    box.innerHTML += `<p>${i.name} - Tsh ${i.price}</p>`;
-  });
-
-  box.innerHTML += `<h3>Total: Tsh ${total}</h3>`;
-}
-
-// START
-loadProducts();
+// Anzisha app
+renderProducts();
