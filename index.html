@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAMAWI AGRO | Go Live</title>
+    <title>SAMAWI AGRO | Pi GCV System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --primary: #1a5e20; --pi-gold: #ffa000; --bg: #f8f9fa; }
@@ -89,7 +89,7 @@
                 <span>Jumla (Pi GCV):</span>
                 <strong id="total-pi">0 Pi</strong>
             </div>
-            <button class="btn-buy" style="background:var(--pi-gold); padding:15px; font-weight:bold;" onclick="onPiPayment()">LIPA NA PI NETWORK</button>
+            <button class="btn-buy" style="background:var(--pi-gold); padding:15px; font-weight:bold;" onclick="checkout()">LIPA NA PI NETWORK</button>
         </div>
     </div>
 
@@ -100,34 +100,15 @@
         <div class="nav-link"><i class="fas fa-user"></i><br>Profile</div>
     </nav>
 
-    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-    
     <script>
-        // 1. ANGAanisha PIA (Pi Network SDK Setup)
-        Pi.init({ version: "2.0", sandbox: true }); // Weka sandbox: false wakati unaruka hewani
-
-        const GCV = 314159; // Thamani ya Pi 1 (GCV)
-
-        // 2. MIFUGO NA MAZAO KWA PICHA HALISI
+        const GCV = 314159; // Bei ya Pi 1 kulingana na maelezo yako
         const items = [
-            // CHAKULA
-            { name: "Gunia la Mahindi", cat: "Chakula", price: 50, img: "image_3.png" }, // Picha halisi ya shamba la mahindi
-            { name: "Mchele Kyela (1kg)", cat: "Chakula", price: 1.5, img: "image_5.png" }, // Picha halisi ya kilimo cha mpunga
-            { name: "Mihogo", cat: "Chakula", price: 10, img: "image_7.png" }, // Picha halisi ya mavuno ya mihogo
-            { name: "Maharage Maharage", cat: "Chakula", price: 20, img: "image_9.png" }, // Picha halisi ya shamba la maharage
-            { name: "Viazi Tamu", cat: "Chakula", price: 8, img: "image_13.png" }, // Picha halisi ya mmea wa viazi tamu
-            // BIASHARA
-            { name: "Kahawa (Ghafi)", cat: "Biashara", price: 120, img: "image_17.png" }, // Picha halisi ya kukausha kahawa
-            { name: "Alizeti", cat: "Biashara", price: 70, img: "image_15.png" }, // Picha halisi ya shamba la alizeti
-            { name: "Korosho", cat: "Biashara", price: 250, img: "image_19.png" }, // Picha halisi ya mkorosho na matunda
-            { name: "Ufuta", cat: "Biashara", price: 90, img: "image_21.png" }, // Picha halisi ya kilimo cha ufuta
-            { name: "Pamba", cat: "Biashara", price: 40, img: "image_23.png" }, // Picha halisi ya shamba la pamba
-            // MIFUGO
-            { name: "Ng'ombe wa Boran", cat: "Mifugo", price: 800, img: "image_27.png" }, // Picha halisi ya dume la ng'ombe la Boran
-            { name: "Ng'ombe wa Zebu", cat: "Mifugo", price: 500, img: "image_29.png" }, // Picha halisi ya ng'ombe wa Zebu
-            { name: "Mbuzi wa Masaii", cat: "Mifugo", price: 150, img: "image_31.png" }, // Picha halisi ya kundi la mbuzi
-            { name: "Kuku wa Kienyeji", cat: "Mifugo", price: 20, img: "image_33.png" }, // Picha halisi ya kuku wa kienyeji
-            { name: "Samaki wa Sato (Kilo)", cat: "Mifugo", price: 15, img: "image_35.png" } // Picha halisi ya kufuga samaki
+            { name: "Mahindi", cat: "Chakula", price: 50, img: "https://via.placeholder.com/150?text=Mahindi" },
+            { name: "Ng'ombe wa Nyama", cat: "Mifugo", price: 450, img: "https://via.placeholder.com/150?text=Ngombe" },
+            { name: "Mbuzi", cat: "Mifugo", price: 80, img: "https://via.placeholder.com/150?text=Mbuzi" },
+            { name: "Samaki (Sato)", cat: "Mifugo", price: 15, img: "https://via.placeholder.com/150?text=Samaki" },
+            { name: "Kuku wa Kienyeji", cat: "Mifugo", price: 10, img: "https://via.placeholder.com/150?text=Kuku" },
+            { name: "Alizeti", cat: "Biashara", price: 120, img: "https://via.placeholder.com/150?text=Alizeti" }
         ];
 
         let cart = [];
@@ -135,10 +116,10 @@
         function render(data = items) {
             const grid = document.getElementById('product-grid');
             grid.innerHTML = data.map(p => {
-                let piPrice = (p.price / GCV).toFixed(8); // Hesabu ya Pi (Product Price ÷ GCV)
+                let piPrice = (p.price / GCV).toFixed(8);
                 return `
                     <div class="card">
-                        <img src="${p.img}" alt="${p.name}">
+                        <img src="${p.img}">
                         <div class="card-body">
                             <p style="margin:0; font-size:0.8rem; font-weight:bold;">${p.name}</p>
                             <span class="p-price">$${p.price}</span>
@@ -150,11 +131,16 @@
             }).join('');
         }
 
-        // --- Kazi za Cart ---
         function addToCart(name, price) {
             cart.push({name, price});
             document.getElementById('cart-count').innerText = cart.length;
-            alert(name + " imeongezwa kwenye kikapu!");
+            alert(name + " imeongezwa!");
+        }
+
+        function showPage(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            if(id === 'cart') renderCart();
         }
 
         function renderCart() {
@@ -169,40 +155,11 @@
             document.getElementById('total-pi').innerText = (totalUsd / GCV).toFixed(8) + " Pi";
         }
 
-        // --- 3. UNGAanisha MALIPO YA PI (Pi Payment Integration) ---
-        async function onPiPayment() {
+        function checkout() {
             if(cart.length === 0) return alert("Kikapu kipo wazi!");
-            const totalUsd = cart.reduce((sum, item) => sum + item.price, 0);
-            const totalPi = (totalUsd / GCV).toFixed(8);
-
-            try {
-                // Hii inafungua dirisha la malipo kwenye Pi Browser
-                const payment = await Pi.createPayment({
-                    amount: totalPi,
-                    memo: "Malipo ya Mazao/Mifugo kutoka Samawi Agro",
-                    metadata: { cartItems: cart.map(i => i.name).join(', ') }
-                });
-
-                // Malipo yakifanikiwa
-                alert("Hongera! Malipo yako ya " + totalPi + " Pi yamepokelewa.");
-                cart = [];
-                showPage('home');
-                
-                // Hapa unaweza kuongeza code ya ku-post malipo kwenye backend yako
-                console.log("Pi Payment Successful:", payment);
-
-            } catch (error) {
-                // Malipo yakishindwa
-                alert("Malipo yameshindwa: " + error.message);
-                console.error("Pi Payment Error:", error);
-            }
-        }
-
-        // --- Kazi za General ---
-        function showPage(id) {
-            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-            document.getElementById(id).classList.remove('hidden');
-            if(id === 'cart') renderCart();
+            alert("Unahamishiwa kwenye Pi Browser kwa ajili ya malipo ya GCV!");
+            cart = [];
+            showPage('home');
         }
 
         render();
