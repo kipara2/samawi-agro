@@ -1,168 +1,172 @@
-<!DOCTYPE html>
-<html lang="sw">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAMAWI AGRO | Pi GCV System</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root { --primary: #1a5e20; --pi-gold: #ffa000; --bg: #f8f9fa; }
-        body { font-family: 'Poppins', sans-serif; margin: 0; background: var(--bg); padding-bottom: 80px; }
-        
-        header { 
-            background: #fff; padding: 15px; display: flex; justify-content: space-between; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000;
-        }
-        .logo { font-weight: 800; color: var(--primary); font-size: 1.2rem; }
+// =======================
+// SAMAWI AGRO MAIN SERVER
+// =======================
 
-        /* Wallet Section */
-        .wallet-card {
-            background: linear-gradient(135deg, #6200ee, #3700b3);
-            color: white; padding: 20px; border-radius: 15px; margin: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 
-        /* Categories */
-        .cat-scroll {
-            display: flex; gap: 10px; overflow-x: auto; padding: 10px 15px;
-            scrollbar-width: none;
-        }
-        .cat-btn {
-            background: white; border: 1px solid #ddd; padding: 8px 20px;
-            border-radius: 20px; white-space: nowrap; cursor: pointer;
-        }
-        .cat-btn.active { background: var(--primary); color: white; border: none; }
+const app = express();
+app.use(express.json());
+app.use(cors());
 
-        /* Grid */
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px; }
-        .card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .card img { width: 100%; height: 110px; object-fit: cover; }
-        .card-body { padding: 10px; }
-        .p-price { color: var(--primary); font-weight: bold; font-size: 0.9rem; }
-        .pi-price { color: var(--pi-gold); font-weight: bold; font-size: 0.8rem; display: block; margin-top: 4px; }
+// =======================
+// DATABASE CONNECTION
+// =======================
+mongoose.connect("mongodb://127.0.0.1:27017/samawi_agro", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log("Database Connected"))
+.catch(err => console.log(err));
 
-        /* Bottom Nav */
-        nav { 
-            position: fixed; bottom: 0; width: 100%; background: white; display: flex; 
-            justify-content: space-around; padding: 12px 0; border-top: 1px solid #eee;
-        }
-        .nav-link { text-align: center; color: #666; font-size: 0.7rem; cursor: pointer; }
-        .nav-link.active { color: var(--primary); font-weight: bold; }
+// =======================
+// MODELS
+// =======================
 
-        .hidden { display: none; }
-        .btn-buy { width: 100%; background: var(--primary); color: white; border: none; padding: 8px; border-radius: 5px; margin-top: 8px; }
-    </style>
-</head>
-<body>
+// USER
+const User = mongoose.model("User", {
+  name: String,
+  phone: String,
+  password: String,
+  role: { type: String, default: "buyer" }, // buyer, seller, admin
+});
 
-    <header>
-        <div class="logo">SAMAWI AGRO</div>
-        <div onclick="showPage('cart')">🛒 <span id="cart-count">0</span></div>
-    </header>
+// PRODUCT
+const Product = mongoose.model("Product", {
+  name: String,
+  price: Number,
+  description: String,
+  image: String,
+  sellerId: String,
+});
 
-    <div id="home" class="page active">
-        <div class="wallet-card">
-            <p style="margin:0; opacity:0.8; font-size:0.8rem;">Salio la Pi (GCV)</p>
-            <h2 id="balance-pi" style="margin:5px 0;">314,159.00 Pi</h2>
-            <p style="margin:0; font-size:0.7rem;">Value: $314,159 per Pi</p>
-        </div>
+// ORDER
+const Order = mongoose.model("Order", {
+  buyerId: String,
+  products: Array,
+  total: Number,
+  status: { type: String, default: "pending" },
+});
 
-        <div class="cat-scroll">
-            <div class="cat-btn active" onclick="filter('Zote')">Zote</div>
-            <div class="cat-btn" onclick="filter('Chakula')">Chakula</div>
-            <div class="cat-btn" onclick="filter('Biashara')">Biashara</div>
-            <div class="cat-btn" onclick="filter('Mifugo')">Mifugo</div>
-        </div>
+// =======================
+// AUTH MIDDLEWARE
+// =======================
+const auth = (req, res, next) => {
+  const token = req.headers["authorization"];
+  if (!token) return res.status(401).send("No token");
 
-        <div id="product-grid" class="grid"></div>
-    </div>
+  try {
+    const decoded = jwt.verify(token, "SECRET_KEY");
+    req.user = decoded;
+    next();
+  } catch {
+    res.status(401).send("Invalid token");
+  }
+};
 
-    <div id="cart" class="page hidden" style="padding:15px;">
-        <h3>Kikapu Chako</h3>
-        <div id="cart-items"></div>
-        <div style="background:white; padding:20px; border-radius:10px; margin-top:20px;">
-            <div style="display:flex; justify-content:space-between">
-                <span>Jumla (USD):</span>
-                <strong id="total-usd">$0</strong>
-            </div>
-            <div style="display:flex; justify-content:space-between; color:var(--pi-gold); margin-top:10px;">
-                <span>Jumla (Pi GCV):</span>
-                <strong id="total-pi">0 Pi</strong>
-            </div>
-            <button class="btn-buy" style="background:var(--pi-gold); padding:15px; font-weight:bold;" onclick="checkout()">LIPA NA PI NETWORK</button>
-        </div>
-    </div>
+// =======================
+// REGISTER
+// =======================
+app.post("/api/register", async (req, res) => {
+  const { name, phone, password } = req.body;
 
-    <nav>
-        <div class="nav-link active" onclick="showPage('home')"><i class="fas fa-home"></i><br>Soko</div>
-        <div class="nav-link" onclick="showPage('cart')"><i class="fas fa-shopping-cart"></i><br>Kikapu</div>
-        <div class="nav-link"><i class="fas fa-wallet"></i><br>Wallet</div>
-        <div class="nav-link"><i class="fas fa-user"></i><br>Profile</div>
-    </nav>
+  const hashed = await bcrypt.hash(password, 10);
 
-    <script>
-        const GCV = 314159; // Bei ya Pi 1 kulingana na maelezo yako
-        const items = [
-            { name: "Mahindi", cat: "Chakula", price: 50, img: "https://via.placeholder.com/150?text=Mahindi" },
-            { name: "Ng'ombe wa Nyama", cat: "Mifugo", price: 450, img: "https://via.placeholder.com/150?text=Ngombe" },
-            { name: "Mbuzi", cat: "Mifugo", price: 80, img: "https://via.placeholder.com/150?text=Mbuzi" },
-            { name: "Samaki (Sato)", cat: "Mifugo", price: 15, img: "https://via.placeholder.com/150?text=Samaki" },
-            { name: "Kuku wa Kienyeji", cat: "Mifugo", price: 10, img: "https://via.placeholder.com/150?text=Kuku" },
-            { name: "Alizeti", cat: "Biashara", price: 120, img: "https://via.placeholder.com/150?text=Alizeti" }
-        ];
+  const user = new User({
+    name,
+    phone,
+    password: hashed,
+  });
 
-        let cart = [];
+  await user.save();
+  res.send("User created");
+});
 
-        function render(data = items) {
-            const grid = document.getElementById('product-grid');
-            grid.innerHTML = data.map(p => {
-                let piPrice = (p.price / GCV).toFixed(8);
-                return `
-                    <div class="card">
-                        <img src="${p.img}">
-                        <div class="card-body">
-                            <p style="margin:0; font-size:0.8rem; font-weight:bold;">${p.name}</p>
-                            <span class="p-price">$${p.price}</span>
-                            <span class="pi-price">${piPrice} Pi</span>
-                            <button class="btn-buy" onclick="addToCart('${p.name}', ${p.price})">Nunua</button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
+// =======================
+// LOGIN
+// =======================
+app.post("/api/login", async (req, res) => {
+  const { phone, password } = req.body;
 
-        function addToCart(name, price) {
-            cart.push({name, price});
-            document.getElementById('cart-count').innerText = cart.length;
-            alert(name + " imeongezwa!");
-        }
+  const user = await User.findOne({ phone });
+  if (!user) return res.send("User not found");
 
-        function showPage(id) {
-            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-            document.getElementById(id).classList.remove('hidden');
-            if(id === 'cart') renderCart();
-        }
+  const valid = await bcrypt.compare(password, user.password);
+  if (!valid) return res.send("Wrong password");
 
-        function renderCart() {
-            const container = document.getElementById('cart-items');
-            let totalUsd = 0;
-            container.innerHTML = cart.map(i => {
-                totalUsd += i.price;
-                return `<div style="background:white; padding:10px; margin-bottom:5px; border-radius:5px;">${i.name} - $${i.price}</div>`;
-            }).join('');
-            
-            document.getElementById('total-usd').innerText = "$" + totalUsd;
-            document.getElementById('total-pi').innerText = (totalUsd / GCV).toFixed(8) + " Pi";
-        }
+  const token = jwt.sign(
+    { id: user._id, role: user.role },
+    "SECRET_KEY"
+  );
 
-        function checkout() {
-            if(cart.length === 0) return alert("Kikapu kipo wazi!");
-            alert("Unahamishiwa kwenye Pi Browser kwa ajili ya malipo ya GCV!");
-            cart = [];
-            showPage('home');
-        }
+  res.json({ token });
+});
 
-        render();
-    </script>
-</body>
-</html>
+// =======================
+// ADD PRODUCT (ADMIN ONLY)
+// =======================
+app.post("/api/product", auth, async (req, res) => {
+  if (req.user.role !== "admin")
+    return res.send("Access denied");
+
+  const product = new Product(req.body);
+  await product.save();
+
+  res.send("Product added");
+});
+
+// =======================
+// GET PRODUCTS
+// =======================
+app.get("/api/products", async (req, res) => {
+  const products = await Product.find();
+  res.json(products);
+});
+
+// =======================
+// CREATE ORDER
+// =======================
+app.post("/api/order", auth, async (req, res) => {
+  const order = new Order({
+    buyerId: req.user.id,
+    products: req.body.products,
+    total: req.body.total,
+  });
+
+  await order.save();
+  res.send("Order created");
+});
+
+// =======================
+// PI PAYMENT (READY)
+// =======================
+app.post("/api/pay/pi", auth, async (req, res) => {
+  // HAPA utaunganisha Pi SDK
+  // Step:
+  // 1. Tuma request kwa Pi Wallet
+  // 2. Subiri confirmation
+  // 3. Update order status
+
+  res.send("Pi payment initiated (connect SDK here)");
+});
+
+// =======================
+// ADMIN CHECK
+// =======================
+app.get("/api/admin-check", auth, (req, res) => {
+  if (req.user.role === "admin") {
+    res.send("Welcome Admin");
+  } else {
+    res.send("Not Admin");
+  }
+});
+
+// =======================
+// START SERVER
+// =======================
+app.listen(3000, () => {
+  console.log("Server running on port 3000");
+});
