@@ -3,70 +3,295 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Samawi Agro | Soko Halisi</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>SAMAWI AGRO | Real System</title>
+    
+    <style>
+        :root {
+            --primary: #2e7d32; /* Kijani ya Kilimo */
+            --accent: #ff6f00; /* Rangi ya biashara */
+            --dark: #1a1a1a;
+            --light: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: var(--light);
+            color: var(--dark);
+            padding-bottom: 80px;
+        }
+
+        /* Header */
+        header {
+            background: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+        .logo span { color: var(--accent); }
+
+        /* Soko / Product Grid */
+        .container { padding: 15px; }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            position: relative;
+        }
+
+        .card img { width: 100%; height: 140px; object-fit: cover; }
+        .card-body { padding: 10px; }
+        .p-name { font-weight: bold; margin: 0; font-size: 1rem; }
+        .p-price { color: var(--primary); font-weight: 900; margin: 5px 0; }
+        .btn-buy {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        /* Wallet & Profile Cards */
+        .wallet-box {
+            background: linear-gradient(135deg, var(--primary), #1b5e20);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Admin / Upload Section */
+        .admin-form {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .upload-area {
+            border: 2px dashed #ccc;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            background: #fafafa;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .btn-save {
+            width: 100%;
+            background: var(--accent);
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        /* Bottom Nav */
+        nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-link { 
+            text-decoration: none; 
+            color: #777; 
+            font-size: 0.8rem; 
+            text-align: center;
+            cursor: pointer;
+        }
+        .nav-link.active { color: var(--primary); font-weight: bold; }
+
+        .hidden { display: none; }
+    </style>
 </head>
 <body>
 
     <header>
         <div class="logo">SAMAWI <span>AGRO</span></div>
-        <div class="header-icons">
-            <i class="fas fa-search" id="search-icon"></i>
-            <div class="cart-icon">
-                <i class="fas fa-shopping-cart"></i>
-                <span id="cart-count">0</span>
-            </div>
-        </div>
+        <div style="font-weight: bold;">🛒 <span id="count">0</span></div>
     </header>
 
-    <main id="app-content">
-        <section id="home-section" class="active-section">
-            <h2 class="section-title">Bidhaa za Leo</h2>
-            <div id="product-grid" class="product-grid">
+    <div class="container">
+        
+        <div id="home" class="page">
+            <h2 style="margin-top: 0;">Soko la Mazao & Mifugo</h2>
+            <div id="product-list" class="grid">
                 </div>
-        </section>
+        </div>
 
-        <section id="wallet-section" class="hidden">
-            <div class="wallet-card">
-                <h3>Salio Lako</h3>
-                <h1 id="user-balance">TSH 0.00</h1>
-                <button class="btn-deposit">Weka Pesa</button>
+        <div id="wallet" class="page hidden">
+            <div class="wallet-box">
+                <p>Salio la Wallet</p>
+                <h1 id="balance-display">Tsh 0.00</h1>
+                <button style="padding: 10px 20px; border-radius: 20px; border: none; font-weight: bold;">Weka Pesa</button>
             </div>
-        </section>
+            <h3>Historia ya Miamala</h3>
+            <p style="color: #999;">Huna miamala mipya bado.</p>
+        </div>
 
-        <section id="admin-section" class="hidden">
-            <div class="upload-container">
-                <h3>Ongeza Bidhaa Mpya</h3>
-                <div class="image-upload" onclick="document.getElementById('file-input').click()">
-                    <i class="fas fa-camera"></i>
-                    <p>Piga Picha au Chagua Gallery</p>
-                    <input type="file" id="file-input" accept="image/*" hidden>
+        <div id="admin" class="page hidden">
+            <div class="admin-form">
+                <h2 style="margin-top: 0;">Ongeza Bidhaa Sokoni</h2>
+                <div class="upload-area" onclick="document.getElementById('image-input').click()">
+                    <span style="font-size: 2rem;">📸</span>
+                    <p>Bofya kupiga picha au kuchagua gallery</p>
+                    <input type="file" id="image-input" accept="image/*" hidden onchange="previewImage(event)">
                 </div>
-                <div id="image-preview"></div>
-                <input type="text" id="p-name" placeholder="Jina la zao (mfano: Mahindi)">
-                <input type="number" id="p-price" placeholder="Bei (Tsh)">
-                <textarea id="p-desc" placeholder="Maelezo ya zao..."></textarea>
-                <button class="btn-save" onclick="uploadProduct()">HIFADHI BIDHAA</button>
+                <div id="preview-container" class="hidden" style="margin-bottom: 10px;">
+                    <img id="image-preview" style="width: 100%; border-radius: 8px;">
+                </div>
+                <input type="text" id="name" placeholder="Jina la Bidhaa (mfano: Ng'ombe, Mahindi)">
+                <input type="number" id="price" placeholder="Bei Halisi (Tsh)">
+                <textarea id="desc" rows="3" placeholder="Maelezo zaidi ya bidhaa..."></textarea>
+                <button class="btn-save" onclick="saveProduct()">SAVE & RUKHA HEWANI</button>
             </div>
-        </section>
-    </main>
+        </div>
 
-    <nav class="bottom-nav">
-        <div class="nav-item active" onclick="switchSection('home-section')">
-            <i class="fas fa-home"></i>
+    </div>
+
+    <nav>
+        <div class="nav-link active" onclick="showPage('home', this)">
+            <div style="font-size: 1.2rem;">🏠</div>
             <span>Soko</span>
         </div>
-        <div class="nav-item" onclick="switchSection('wallet-section')">
-            <i class="fas fa-wallet"></i>
+        <div class="nav-link" onclick="showPage('wallet', this)">
+            <div style="font-size: 1.2rem;">💳</div>
             <span>Wallet</span>
         </div>
-        <div class="nav-item" onclick="switchSection('admin-section')">
-            <i class="fas fa-user-shield"></i>
+        <div class="nav-link" onclick="showPage('admin', this)">
+            <div style="font-size: 1.2rem;">⚙️</div>
             <span>Admin</span>
         </div>
     </nav>
 
-    <script src="app.js"></script>
+    <script>
+        // Database ya ndani ya simu (Local Storage) ili bidhaa zisifutike ukizima simu
+        let products = JSON.parse(localStorage.getItem('samawi_products')) || [];
+
+        // Kazi ya kuonesha Page
+        function showPage(pageId, element) {
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+            document.getElementById(pageId).classList.remove('hidden');
+            
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        // Preview ya picha
+        function previewImage(event) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                const preview = document.getElementById('image-preview');
+                preview.src = reader.result;
+                document.getElementById('preview-container').classList.remove('hidden');
+            }
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+        // Kazi ya Ku-save Bidhaa
+        function saveProduct() {
+            const name = document.getElementById('name').value;
+            const price = document.getElementById('price').value;
+            const desc = document.getElementById('desc').value;
+            const image = document.getElementById('image-preview').src;
+
+            if(!name || !price || !image) {
+                alert("Tafadhali kamilisha maelezo na picha!");
+                return;
+            }
+
+            const newProduct = {
+                id: Date.now(),
+                name: name,
+                price: parseInt(price),
+                desc: desc,
+                image: image
+            };
+
+            products.unshift(newProduct); // Weka juu ya list
+            localStorage.setItem('samawi_products', JSON.stringify(products)); // Hifadhi kabisa
+            
+            alert("Bidhaa imewekwa Sokoni kwa Mafanikio!");
+            
+            // Safisha Form
+            document.getElementById('name').value = '';
+            document.getElementById('price').value = '';
+            document.getElementById('preview-container').classList.add('hidden');
+            
+            renderProducts();
+            showPage('home', document.querySelector('.nav-link')); // Rudi Home
+        }
+
+        // Kazi ya kuonesha bidhaa kwenye Soko
+        function renderProducts() {
+            const list = document.getElementById('product-list');
+            list.innerHTML = "";
+
+            if(products.length === 0) {
+                list.innerHTML = "<p style='grid-column: span 2; text-align: center; color: #999;'>Bado hakuna bidhaa sokoni.</p>";
+                return;
+            }
+
+            products.forEach(p => {
+                list.innerHTML += `
+                    <div class="card">
+                        <img src="${p.image}">
+                        <div class="card-body">
+                            <p class="p-name">${p.name}</p>
+                            <p class="p-price">Tsh ${p.price.toLocaleString()}</p>
+                            <button class="btn-buy" onclick="addToCart()">Nunua</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        let cartCount = 0;
+        function addToCart() {
+            cartCount++;
+            document.getElementById('count').innerText = cartCount;
+            alert("Imeongezwa kwenye kikapu!");
+        }
+
+        // Pakia bidhaa mara ya kwanza
+        renderProducts();
+
+    </script>
 </body>
 </html>
