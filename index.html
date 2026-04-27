@@ -3,26 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Samawi Agro - Soko la Mazao</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Samawi Agro | Soko Halisi</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
-    <header class="main-header">
-        <div class="container">
-            <h1 class="logo">Samawi Agro 🌱</h1>
+    <header>
+        <div class="logo">SAMAWI <span>AGRO</span></div>
+        <div class="header-icons">
+            <i class="fas fa-search" id="search-icon"></i>
             <div class="cart-icon">
-                🛒 <span id="cart-count">0</span>
+                <i class="fas fa-shopping-cart"></i>
+                <span id="cart-count">0</span>
             </div>
         </div>
     </header>
 
-    <main class="container">
-        <h2 class="section-title">Mazao mapya sokoni</h2>
-        <div id="mazau-grid" class="mazau-grid">
+    <main id="app-content">
+        <section id="home-section" class="active-section">
+            <h2 class="section-title">Bidhaa za Leo</h2>
+            <div id="product-grid" class="product-grid">
+                </div>
+        </section>
+
+        <section id="wallet-section" class="hidden">
+            <div class="wallet-card">
+                <h3>Salio Lako</h3>
+                <h1 id="user-balance">TSH 0.00</h1>
+                <button class="btn-deposit">Weka Pesa</button>
             </div>
+        </section>
+
+        <section id="admin-section" class="hidden">
+            <div class="upload-container">
+                <h3>Ongeza Bidhaa Mpya</h3>
+                <div class="image-upload" onclick="document.getElementById('file-input').click()">
+                    <i class="fas fa-camera"></i>
+                    <p>Piga Picha au Chagua Gallery</p>
+                    <input type="file" id="file-input" accept="image/*" hidden>
+                </div>
+                <div id="image-preview"></div>
+                <input type="text" id="p-name" placeholder="Jina la zao (mfano: Mahindi)">
+                <input type="number" id="p-price" placeholder="Bei (Tsh)">
+                <textarea id="p-desc" placeholder="Maelezo ya zao..."></textarea>
+                <button class="btn-save" onclick="uploadProduct()">HIFADHI BIDHAA</button>
+            </div>
+        </section>
     </main>
+
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="switchSection('home-section')">
+            <i class="fas fa-home"></i>
+            <span>Soko</span>
+        </div>
+        <div class="nav-item" onclick="switchSection('wallet-section')">
+            <i class="fas fa-wallet"></i>
+            <span>Wallet</span>
+        </div>
+        <div class="nav-item" onclick="switchSection('admin-section')">
+            <i class="fas fa-user-shield"></i>
+            <span>Admin</span>
+        </div>
+    </nav>
 
     <script src="app.js"></script>
 </body>
