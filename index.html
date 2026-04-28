@@ -115,7 +115,24 @@
         <button onclick="changeView('profile')" id="nav-profile" class="flex flex-col items-center gap-1 w-1/4 h-full pt-2 text-gray-400">
             <i class="fa-solid fa-user"></i><span class="text-[10px] font-bold">PROFILE</span>
         </button>
-    </nav>
+    </nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around items-center h-16 shadow-lg z-50">
+    <button onclick="changeView('home')" id="nav-home" class="flex flex-col items-center gap-1 w-1/5 h-full pt-2 nav-active">
+        <i class="fa-solid fa-house"></i><span class="text-[10px] font-bold">HOME</span>
+    </button>
+    <button onclick="changeView('soko')" id="nav-soko" class="flex flex-col items-center gap-1 w-1/5 h-full pt-2 text-gray-400">
+        <i class="fa-solid fa-store"></i><span class="text-[10px] font-bold">SOKO</span>
+    </button>
+    <button onclick="changeView('cart')" id="nav-cart" class="flex flex-col items-center gap-1 w-1/5 h-full pt-2 text-gray-400 relative">
+        <i class="fa-solid fa-cart-shopping"></i><span class="text-[10px] font-bold">CART</span>
+        <span id="cart-count" class="absolute top-1 right-2 bg-red-500 text-white text-[8px] px-1 rounded-full hidden">0</span>
+    </button>
+    <button onclick="changeView('wallet')" id="nav-wallet" class="flex flex-col items-center gap-1 w-1/5 h-full pt-2 text-gray-400">
+        <i class="fa-solid fa-wallet"></i><span class="text-[10px] font-bold">WALLET</span>
+    </button>
+    <button onclick="changeView('profile')" id="nav-profile" class="flex flex-col items-center gap-1 w-1/5 h-full pt-2 text-gray-400">
+        <i class="fa-solid fa-user"></i><span class="text-[10px] font-bold">PROFILE</span>
+    </button>
+</nav>
 
     <script>
         function changeView(viewId) {
