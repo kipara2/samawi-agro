@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Samawi Agro | Marketplace & Wallet</title>
+    <title>Samawi Agro | Testnet Wallet</title>
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        .nav-active { color: #15803d; border-top: 3px solid #15803d; }
+        .nav-active { color: #6d28d9; border-bottom: 3px solid #6d28d9; }
+        .pi-purple { background-color: #6d28d9; }
+        .pi-text-purple { color: #6d28d9; }
         body { padding-bottom: 90px; }
         .view { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -17,223 +19,180 @@
 </head>
 <body class="bg-gray-50 text-gray-800">
 
-    <header class="bg-white p-4 shadow-sm sticky top-0 z-50 flex justify-between items-center">
-        <h1 class="text-xl font-black text-green-700">SAMAWI AGRO</h1>
-        <div class="flex gap-4 text-gray-500">
-            <i class="fa-solid fa-magnifying-glass text-xl"></i>
-            <i class="fa-solid fa-bell text-xl"></i>
+    <header class="pi-purple p-4 shadow-md sticky top-0 z-50 flex justify-between items-center text-white">
+        <h1 class="text-xl font-black">SAMAWI AGRO</h1>
+        <div class="flex gap-4">
+            <div class="relative">
+                <i class="fa-solid fa-bell text-xl"></i>
+                <span id="notif-dot" class="absolute -top-1 -right-1 bg-red-500 w-2 h-2 rounded-full hidden"></span>
+            </div>
         </div>
     </header>
 
     <div id="app-container" class="container mx-auto p-4">
         
-        <section id="view-home" class="view">
-            <div class="bg-gradient-to-r from-green-600 to-green-800 rounded-2xl p-6 text-white mb-6 shadow-lg">
-                <p class="text-xs uppercase font-bold opacity-80">Ofa ya Leo</p>
-                <h2 class="text-2xl font-bold">Pata Pembejeo Bora kwa Pi</h2>
-                <button onclick="changeView('soko')" class="mt-4 bg-yellow-500 text-green-900 px-4 py-2 rounded-lg font-bold text-sm shadow-md">Gundua Sasa</button>
-            </div>
-            <h3 class="font-bold mb-4 italic">Kategoria Kuu</h3>
-            <div class="grid grid-cols-4 gap-2 mb-8 text-center">
-                <div><div class="bg-white p-4 rounded-xl shadow-sm mb-1 flex justify-center text-orange-500"><i class="fa-solid fa-cow"></i></div><span class="text-[10px] font-bold">Mifugo</span></div>
-                <div><div class="bg-white p-4 rounded-xl shadow-sm mb-1 flex justify-center text-green-600"><i class="fa-solid fa-wheat-awn"></i></div><span class="text-[10px] font-bold">Mazao</span></div>
-                <div><div class="bg-white p-4 rounded-xl shadow-sm mb-1 flex justify-center text-blue-500"><i class="fa-solid fa-tractor"></i></div><span class="text-[10px] font-bold">Zana</span></div>
-                <div><div class="bg-white p-4 rounded-xl shadow-sm mb-1 flex justify-center text-purple-500"><i class="fa-solid fa-flask"></i></div><span class="text-[10px] font-bold">Dawa</span></div>
-            </div>
-        </section>
-
-        <section id="view-soko" class="view hidden">
-            <h2 class="text-xl font-bold mb-4 text-green-700 underline italic">Soko la Kimataifa</h2>
-            <div class="grid grid-cols-2 gap-4">
-                <div class="bg-white rounded-xl shadow-sm overflow-hidden border">
-                    <img src="https://images.unsplash.com/photo-1524024973431-2ad916746881?auto=format&fit=crop&w=300&q=80" class="w-full h-32 object-cover">
-                    <div class="p-3">
-                        <h4 class="font-bold text-sm">Mbuzi</h4>
-                        <p class="text-green-600 font-bold">2.5 Pi</p>
-                        <button onclick="addToCart('Mbuzi', 2.5)" class="w-full mt-2 bg-green-600 text-white py-1 rounded text-xs font-bold">Weka Kapuni</button>
-                    </div>
-                </div>
-                <div class="bg-white rounded-xl shadow-sm overflow-hidden border">
-                    <img src="https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=300&q=80" class="w-full h-32 object-cover">
-                    <div class="p-3">
-                        <h4 class="font-bold text-sm">Mpunga</h4>
-                        <p class="text-green-600 font-bold">1.2 Pi</p>
-                        <button onclick="addToCart('Mpunga', 1.2)" class="w-full mt-2 bg-green-600 text-white py-1 rounded text-xs font-bold">Weka Kapuni</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="view-cart" class="view hidden">
-            <h2 class="text-xl font-bold mb-4 text-green-700">Kapu la Manunuzi</h2>
-            <div id="cart-items" class="space-y-3 mb-6"></div>
-            <div id="cart-summary" class="bg-white p-4 rounded-xl shadow-md border hidden text-center">
-                <div class="flex justify-between mb-4 font-bold text-lg">
-                    <span>Jumla:</span><span id="cart-total" class="text-green-700">0 Pi</span>
-                </div>
-                <button onclick="payWithPi()" class="w-full bg-green-600 text-white py-3 rounded-lg font-bold shadow-lg">LIPA KWA PI SDK</button>
-            </div>
-        </section>
-
-        <section id="view-wallet" class="view hidden">
+        <section id="view-wallet" class="view">
             <div class="bg-white rounded-2xl p-6 shadow-sm border text-center mb-6">
-                <i class="fa-solid fa-wallet text-4xl text-yellow-500 mb-2"></i>
-                <h2 class="text-gray-500 text-sm font-bold uppercase">Salio la Pi</h2>
-                <p class="text-4xl font-black text-gray-800">0.00 <span class="text-lg text-green-600">Pi</span></p>
+                <div class="bg-gray-100 px-3 py-1 rounded-full text-[10px] font-bold inline-block mb-3">Pi Testnet</div>
+                <h2 class="text-gray-500 text-xs font-bold uppercase">Salio la Majaribio</h2>
+                <p class="text-4xl font-black text-gray-800"><span id="wallet-balance">100.00</span> <span class="text-lg pi-text-purple">Test-Pi</span></p>
+                <p class="text-[9px] text-gray-400 mt-2 break-all" id="my-address">GDCGEFISZ457SQZNKLQCMGSJMLMJX5QVMIYTYX3X6DJYOFAUP5OHCMAH</p>
             </div>
 
-            <div class="flex gap-4 mb-8">
-                <button onclick="toggleWalletView('send')" class="flex-1 bg-green-600 text-white py-3 rounded-xl font-bold"><i class="fa-solid fa-paper-plane mr-2"></i>TUMA</button>
-                <button onclick="toggleWalletView('receive')" class="flex-1 border border-green-600 text-green-600 py-3 rounded-xl font-bold"><i class="fa-solid fa-qrcode mr-2"></i>POKEA</button>
+            <div class="flex gap-2 mb-8">
+                <button onclick="changeView('pay')" class="flex-1 pi-purple text-white py-3 rounded-xl font-bold shadow-lg flex flex-col items-center">
+                    <i class="fa-solid fa-paper-plane mb-1"></i><span class="text-xs">TUMA</span>
+                </button>
+                <button onclick="showReceive()" class="flex-1 border-2 border-purple-600 pi-text-purple py-3 rounded-xl font-bold flex flex-col items-center">
+                    <i class="fa-solid fa-qrcode mb-1"></i><span class="text-xs">POKEA</span>
+                </button>
             </div>
 
-            <div id="wallet-send" class="bg-white p-5 rounded-xl border hidden shadow-sm">
-                <h3 class="font-bold text-sm mb-4">Tuma Pi kwa Address</h3>
+            <h3 class="font-bold text-sm mb-3">History ya Miamala</h3>
+            <div id="history-list" class="space-y-2">
+                <p class="text-center text-gray-400 py-10 text-xs italic">Hakuna miamala bado...</p>
+            </div>
+        </section>
+
+        <section id="view-pay" class="view hidden">
+            <div class="bg-white p-5 rounded-2xl border shadow-sm">
+                <h2 class="text-center font-bold mb-6">Tuma Test-Pi</h2>
                 <div class="space-y-4">
-                    <input type="text" id="target-address" placeholder="Wallet Address ya mpokeaji" class="w-full p-3 bg-gray-50 border rounded-lg text-sm">
-                    <input type="number" id="send-amount" placeholder="Kiasi (Pi)" class="w-full p-3 bg-gray-50 border rounded-lg text-sm">
-                    <button onclick="initiateSend()" class="w-full bg-orange-600 text-white py-3 rounded-lg font-bold shadow-md">THIBITISHA MUAMALA</button>
-                </div>
-            </div>
-
-            <div id="wallet-receive" class="bg-white p-5 rounded-xl border hidden shadow-sm text-center">
-                <h3 class="font-bold text-sm mb-4">Scan QR Code au Nakili Address</h3>
-                <div id="qrcode" class="flex justify-center mb-5"></div>
-                <div class="bg-gray-100 p-3 rounded text-[10px] break-all font-mono mb-4 text-gray-600" id="display-address">GDCGEFISZ457SQZNKLQCMGSJMLMJX5QVMIYTYX3X6DJYOFAUP5OHCMAH</div>
-                <button onclick="copyMyAddress()" class="text-blue-600 font-bold text-xs"><i class="fa-solid fa-copy mr-1"></i>Copy Wallet Address</button>
-            </div>
-        </section>
-
-        <section id="view-profile" class="view hidden">
-            <div class="flex items-center gap-4 mb-8 bg-white p-4 rounded-2xl shadow-sm border-l-4 border-green-600">
-                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-2xl font-bold text-green-700" id="user-initial">S</div>
-                <div>
-                    <h3 class="font-bold text-lg text-gray-800" id="display-username">Mwanachama</h3>
-                    <p class="text-xs text-gray-500 italic">User ID: GDCGEFIS...</p>
+                    <input type="text" id="target-addr" placeholder="Wallet Address" class="w-full p-4 bg-gray-50 border rounded-xl outline-none focus:border-purple-600">
+                    <input type="number" id="send-amt" placeholder="0.00 Pi" class="w-full p-4 bg-gray-50 border rounded-xl outline-none focus:border-purple-600">
+                    <button onclick="handleTestPayment()" class="w-full pi-purple text-white py-4 rounded-xl font-bold shadow-lg">THIBITISHA MUAMALA</button>
+                    <button onclick="changeView('wallet')" class="w-full text-gray-400 font-bold py-2">Ghairi</button>
                 </div>
             </div>
         </section>
+
+        <div id="modal-receive" class="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center hidden p-4">
+            <div class="bg-white w-full max-w-sm rounded-3xl p-6 text-center">
+                <h3 class="font-bold mb-4">Scan QR Code Kupokea</h3>
+                <div id="qrcode" class="flex justify-center mb-6"></div>
+                <div class="bg-gray-100 p-3 rounded-lg text-[10px] break-all font-mono mb-4">GDCGEFISZ457SQZNKLQCMGSJMLMJX5QVMIYTYX3X6DJYOFAUP5OHCMAH</div>
+                <button onclick="closeReceive()" class="w-full pi-purple text-white py-3 rounded-xl font-bold">Funga</button>
+            </div>
+        </div>
 
     </div>
 
     <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around items-center h-16 shadow-2xl z-50">
-        <button onclick="changeView('home')" id="nav-home" class="w-1/5 h-full flex flex-col items-center justify-center pt-1 nav-active"><i class="fa-solid fa-house"></i><span class="text-[10px] font-bold">HOME</span></button>
-        <button onclick="changeView('soko')" id="nav-soko" class="w-1/5 h-full flex flex-col items-center justify-center pt-1 text-gray-400"><i class="fa-solid fa-store"></i><span class="text-[10px] font-bold">SOKO</span></button>
-        <button onclick="changeView('cart')" id="nav-cart" class="w-1/5 h-full flex flex-col items-center justify-center pt-1 text-gray-400 relative"><i class="fa-solid fa-cart-shopping"></i><span id="cart-count" class="absolute top-2 right-4 bg-red-600 text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold hidden">0</span><span class="text-[10px] font-bold">CART</span></button>
-        <button onclick="changeView('wallet')" id="nav-wallet" class="w-1/5 h-full flex flex-col items-center justify-center pt-1 text-gray-400"><i class="fa-solid fa-wallet"></i><span class="text-[10px] font-bold">WALLET</span></button>
-        <button onclick="changeView('profile')" id="nav-profile" class="w-1/5 h-full flex flex-col items-center justify-center pt-1 text-gray-400"><i class="fa-solid fa-user"></i><span class="text-[10px] font-bold">PROFILE</span></button>
+        <button onclick="changeView('home')" id="nav-home" class="flex flex-col items-center gap-1 w-1/4 pt-2 text-gray-400">
+            <i class="fa-solid fa-house"></i><span class="text-[10px] font-bold uppercase">Soko</span>
+        </button>
+        <button onclick="changeView('wallet')" id="nav-wallet" class="flex flex-col items-center gap-1 w-1/4 pt-2 nav-active">
+            <i class="fa-solid fa-wallet"></i><span class="text-[10px] font-bold uppercase">Wallet</span>
+        </button>
     </nav>
 
     <script>
         const Pi = window.Pi;
-        let cart = [];
-        const MY_PUBLIC_ADDRESS = "GDCGEFISZ457SQZNKLQCMGSJMLMJX5QVMIYTYX3X6DJYOFAUP5OHCMAH";
+        let myBalance = 100.00;
+        let history = [];
 
-        // Initialize Pi SDK
+        // 1. Initialize Pi SDK
         Pi.init({ version: "2.0" });
 
-        // Authenticate User
-        async function auth() {
+        // 2. Authentication
+        async function authenticate() {
             try {
                 const scopes = ['username', 'payments'];
-                const auth = await Pi.authenticate(scopes, (p) => console.log("Incomplete payment:", p));
-                document.getElementById('display-username').innerText = auth.user.username;
-                document.getElementById('user-initial').innerText = auth.user.username[0].toUpperCase();
+                const auth = await Pi.authenticate(scopes, onIncompletePaymentFound);
+                console.log("Authenticated as:", auth.user.username);
             } catch (err) {
-                console.error("Auth failed:", err);
+                console.error(err);
             }
         }
 
+        function onIncompletePaymentFound(payment) {
+            console.log("Found incomplete payment", payment);
+            // Hapa unaweza ku-complete malipo yaliyokwama
+        };
+
+        // 3. View Management
         function changeView(viewId) {
             document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
             document.getElementById('view-' + viewId).classList.remove('hidden');
-            document.querySelectorAll('nav button').forEach(b => {
-                b.classList.remove('nav-active');
-                b.classList.add('text-gray-400');
-            });
-            document.getElementById('nav-' + viewId).classList.add('nav-active');
-            document.getElementById('nav-' + viewId).classList.remove('text-gray-400');
-            if(viewId === 'cart') renderCart();
-            if(viewId === 'wallet') generateMyQR();
+            
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('nav-active'));
+            if(viewId === 'wallet') document.getElementById('nav-wallet').classList.add('nav-active');
         }
 
-        // Cart Functions
-        function addToCart(name, price) {
-            cart.push({ name, price });
-            const c = document.getElementById('cart-count');
-            c.innerText = cart.length;
-            c.classList.remove('hidden');
-            alert(name + " imewekwa kapuni!");
-        }
-
-        function renderCart() {
-            const container = document.getElementById('cart-items');
-            const summary = document.getElementById('cart-summary');
-            if (cart.length === 0) {
-                container.innerHTML = '<p class="text-center text-gray-400 py-10">Kapu lako halina kitu.</p>';
-                summary.classList.add('hidden');
-                return;
-            }
-            summary.classList.remove('hidden');
-            container.innerHTML = '';
-            let total = 0;
-            cart.forEach(item => {
-                total += item.price;
-                container.innerHTML += `<div class="flex justify-between bg-white p-3 rounded-lg border"><span>${item.name}</span><b>${item.price} Pi</b></div>`;
-            });
-            document.getElementById('cart-total').innerText = total.toFixed(2) + " Pi";
-        }
-
-        // Wallet Functions
-        function toggleWalletView(type) {
-            document.getElementById('wallet-send').classList.add('hidden');
-            document.getElementById('wallet-receive').classList.add('hidden');
-            document.getElementById('wallet-' + type).classList.remove('hidden');
-        }
-
-        function generateMyQR() {
+        function showReceive() {
+            document.getElementById('modal-receive').classList.remove('hidden');
             const qrDiv = document.getElementById("qrcode");
-            if (qrDiv.innerHTML === "") {
-                new QRCode(qrDiv, { text: MY_PUBLIC_ADDRESS, width: 150, height: 150 });
+            if(qrDiv.innerHTML === "") {
+                new QRCode(qrDiv, { text: "GDCGEFISZ457SQZNKLQCMGSJMLMJX5QVMIYTYX3X6DJYOFAUP5OHCMAH", width: 180, height: 180 });
             }
         }
 
-        function copyMyAddress() {
-            navigator.clipboard.writeText(MY_PUBLIC_ADDRESS);
-            alert("Address yako imenakiliwa!");
+        function closeReceive() {
+            document.getElementById('modal-receive').classList.add('hidden');
         }
 
-        async function initiateSend() {
-            const addr = document.getElementById('target-address').value;
-            const amt = document.getElementById('send-amount').value;
-            if(!addr || !amt) return alert("Jaza taarifa zote!");
-            alert("Mfumo wa Pi Payment unafunguka kutuma " + amt + " Pi...");
-            // Hapa itatumia Pi.createPayment
-        }
+        // 4. Mfumo wa Malipo (Real Testnet Transaction)
+        async function handleTestPayment() {
+            const amount = parseFloat(document.getElementById('send-amt').value);
+            const address = document.getElementById('target-addr').value;
 
-        async function payWithPi() {
-            const total = cart.reduce((a, b) => a + b.price, 0);
+            if(!amount || !address) return alert("Tafadhali jaza kiasi na address!");
+
             try {
                 const payment = await Pi.createPayment({
-                    amount: total,
-                    memo: "Samawi Agro Shopping",
-                    metadata: { items: cart.map(i => i.name).join(",") }
+                    amount: amount,
+                    memo: "Test Transaction kutoka Samawi Wallet",
+                    metadata: { type: "test_transfer" }
                 }, {
-                    onReadyForServerApproval: (id) => console.log("Approved ID:", id),
-                    onReadyForServerCompletion: (id, tx) => {
-                        alert("Malipo Yamefanikiwa!");
-                        cart = [];
-                        changeView('home');
+                    onReadyForServerApproval: function(paymentId) {
+                        console.log("Approve paymentId:", paymentId);
+                        // Kwenye ulimwengu wa kweli, hapa unatuma ID kwa server yako
                     },
-                    onCancel: (id) => console.log("Cancelled"),
-                    onError: (err) => console.error(err)
+                    onReadyForServerCompletion: function(paymentId, txid) {
+                        updateHistory("Tuma", amount, address, "Kimekamilika", txid);
+                        myBalance -= amount;
+                        document.getElementById('wallet-balance').innerText = myBalance.toFixed(2);
+                        showNotification("Muamala umefanikiwa!");
+                        changeView('wallet');
+                    },
+                    onCancel: (paymentId) => console.log("User cancelled"),
+                    onError: (error, payment) => alert("Hitilafu: " + error.message)
                 });
             } catch (err) {
-                alert("Hitilafu: " + err.message);
+                alert("Pi SDK haikuweza kufunguka. Hakikisha upo ndani ya Pi Browser!");
             }
         }
 
-        auth(); // Start authentication
+        // 5. History & Notifications
+        function updateHistory(type, amt, addr, status, txid) {
+            const historyList = document.getElementById('history-list');
+            if(history.length === 0) historyList.innerHTML = "";
+            
+            const date = new Date().toLocaleString();
+            const item = `
+                <div class="bg-white p-3 rounded-xl border-l-4 ${type === 'Tuma' ? 'border-red-500' : 'border-green-500'} shadow-sm">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="font-bold text-xs">${type} Pi</p>
+                            <p class="text-[10px] text-gray-400 font-mono">${addr.substring(0,10)}...</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-bold ${type === 'Tuma' ? 'text-red-500' : 'text-green-600'} text-xs">${type === 'Tuma' ? '-' : '+'}${amt} Pi</p>
+                            <p class="text-[8px] text-gray-400">${date}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            historyList.insertAdjacentHTML('afterbegin', item);
+            history.push({type, amt, date});
+        }
+
+        function showNotification(msg) {
+            document.getElementById('notif-dot').classList.remove('hidden');
+            alert(msg);
+        }
+
+        authenticate();
     </script>
 </body>
 </html>
