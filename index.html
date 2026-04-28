@@ -3,80 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Samawi Agro | Real Pi Payments</title>
+    <title>Samawi Agro | Marketplace</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .nav-active { color: #15803d; border-top: 3px solid #15803d; }
+        body { padding-bottom: 80px; }
+    </style>
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-50 text-gray-800">
 
-    <nav class="bg-green-700 text-white p-4 shadow-lg sticky top-0 z-50">
-        <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-black">SAMAWI <span class="text-yellow-400">AGRO</span></h1>
-            <button id="login-btn" onclick="loginWithPi()" class="bg-yellow-500 text-green-900 px-5 py-2 rounded-full font-bold">Ingia na Pi</button>
+    <header class="bg-white p-4 shadow-sm sticky top-0 z-50 flex justify-between items-center">
+        <h1 class="text-xl font-black text-green-700">SAMAWI AGRO</h1>
+        <div class="flex gap-4">
+            <i class="fa-solid fa-magnifying-glass text-gray-500 text-xl"></i>
+            <i class="fa-solid fa-message text-gray-500 text-xl"></i>
         </div>
+    </header>
+
+    <div id="app-container" class="container mx-auto p-4">
+        
+        <section id="view-home" class="view">
+            <div class="bg-gradient-to-r from-green-600 to-green-800 rounded-2xl p-6 text-white mb-6 shadow-lg">
+                <p class="text-xs uppercase font-bold opacity-80">Ofa ya Leo</p>
+                <h2 class="text-2xl font-bold">Pata Pembejeo Bora kwa Pi</h2>
+                <button class="mt-4 bg-yellow-500 text-green-900 px-4 py-2 rounded-lg font-bold text-sm">Gundua Sasa</button>
+            </div>
+
+            <h3 class="font-bold mb-4">Kategoria Kuu</h3>
+            <div class="grid grid-cols-4 gap-2 mb-8">
+                <div class="text-center">
+                    <div class="bg-white p-4 rounded-xl shadow-sm mb-1"><i class="fa-solid fa-cow text-orange-500"></i></div>
+                    <span class="text-[10px] font-bold">Mifugo</span>
+                </div>
+                <div class="text-center">
+                    <div class="bg-white p-4 rounded-xl shadow-sm mb-1"><i class="fa-solid fa-wheat-awn text-green-600"></i></div>
+                    <span class="text-[10px] font-bold">Mazao</span>
+                </div>
+                <div class="text-center">
+                    <div class="bg-white p-4 rounded-xl shadow-sm mb-1"><i class="fa-solid fa-tractor text-blue-500"></i></div>
+                    <span class="text-[10px] font-bold">Zana</span>
+                </div>
+                <div class="text-center">
+                    <div class="bg-white p-4 rounded-xl shadow-sm mb-1"><i class="fa-solid fa-flask text-purple-500"></i></div>
+                    <span class="text-[10px] font-bold">Dawa</span>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-soko" class="view hidden">
+            <h2 class="text-xl font-bold mb-4 text-green-700 underline">Soko la Kimataifa</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden border">
+                    <div class="h-32 bg-gray-200"></div>
+                    <div class="p-3">
+                        <h4 class="font-bold text-sm">Mbuzi wa Nyama</h4>
+                        <p class="text-green-600 font-bold">2.5 Pi</p>
+                        <button class="w-full mt-2 bg-green-100 text-green-700 py-1 rounded text-xs font-bold">Weka Kapuni</button>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden border">
+                    <div class="h-32 bg-gray-200"></div>
+                    <div class="p-3">
+                        <h4 class="font-bold text-sm">Gunia la Mpunga</h4>
+                        <p class="text-green-600 font-bold">1.2 Pi</p>
+                        <button class="w-full mt-2 bg-green-100 text-green-700 py-1 rounded text-xs font-bold">Weka Kapuni</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-wallet" class="view hidden">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border text-center">
+                <i class="fa-solid fa-wallet text-4xl text-yellow-500 mb-2"></i>
+                <h2 class="text-gray-500 text-sm">Salio Lako la Pi</h2>
+                <p class="text-4xl font-black text-gray-800">0.00 <span class="text-lg">Pi</span></p>
+                <div class="flex gap-2 mt-6">
+                    <button class="flex-1 bg-green-600 text-white py-3 rounded-xl font-bold">Ingiza (Deposit)</button>
+                    <button class="flex-1 border border-green-600 text-green-600 py-3 rounded-xl font-bold">Toa (Withdraw)</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-profile" class="view hidden">
+            <div class="flex items-center gap-4 mb-8 bg-white p-4 rounded-2xl shadow-sm">
+                <div class="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center text-2xl font-bold text-white">S</div>
+                <div>
+                    <h3 class="font-bold text-lg">Mwanachama wa Samawi</h3>
+                    <p class="text-xs text-gray-500">ID: PI-9928374</p>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <div class="bg-white p-4 rounded-xl flex justify-between"><span>Oda Zangu</span> <i class="fa-solid fa-chevron-right text-gray-400"></i></div>
+                <div class="bg-white p-4 rounded-xl flex justify-between"><span>Duka Langu (Muuzaji)</span> <i class="fa-solid fa-chevron-right text-gray-400"></i></div>
+                <div class="bg-white p-4 rounded-xl flex justify-between text-red-500"><span>Ondoka (Logout)</span></div>
+            </div>
+        </section>
+
+    </div>
+
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around items-center h-16 shadow-lg z-50">
+        <button onclick="changeView('home')" id="nav-home" class="flex flex-col items-center gap-1 w-1/4 h-full pt-2 nav-active">
+            <i class="fa-solid fa-house"></i><span class="text-[10px] font-bold">HOME</span>
+        </button>
+        <button onclick="changeView('soko')" id="nav-soko" class="flex flex-col items-center gap-1 w-1/4 h-full pt-2 text-gray-400">
+            <i class="fa-solid fa-store"></i><span class="text-[10px] font-bold">SOKO</span>
+        </button>
+        <button onclick="changeView('wallet')" id="nav-wallet" class="flex flex-col items-center gap-1 w-1/4 h-full pt-2 text-gray-400">
+            <i class="fa-solid fa-wallet"></i><span class="text-[10px] font-bold">WALLET</span>
+        </button>
+        <button onclick="changeView('profile')" id="nav-profile" class="flex flex-col items-center gap-1 w-1/4 h-full pt-2 text-gray-400">
+            <i class="fa-solid fa-user"></i><span class="text-[10px] font-bold">PROFILE</span>
+        </button>
     </nav>
 
-    <main class="container mx-auto p-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                <i class="fa-solid fa-cow text-5xl text-green-600 mb-4"></i>
-                <h3 class="text-xl font-bold">Ng'ombe wa Maziwa</h3>
-                <p class="text-gray-500">Aina ya Friesian, Afya bora.</p>
-                <div class="mt-6 flex justify-between items-center">
-                    <span class="text-2xl font-black text-green-700">15.0 Pi</span>
-                    <button onclick="lipa('Ngombe', 15.0)" class="bg-green-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-green-800 transition">Nunua Sasa</button>
-                </div>
-            </div>
-
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                <i class="fa-solid fa-seedling text-5xl text-green-600 mb-4"></i>
-                <h3 class="text-xl font-bold">Mahindi (Gunia 1)</h3>
-                <p class="text-gray-500">Mazao mapya kutoka shambani.</p>
-                <div class="mt-6 flex justify-between items-center">
-                    <span class="text-2xl font-black text-green-700">2.5 Pi</span>
-                    <button onclick="lipa('Mahindi', 2.5)" class="bg-green-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-green-800 transition">Nunua Sasa</button>
-                </div>
-            </div>
-        </div>
-    </main>
-
     <script>
-        const Pi = window.Pi;
-        Pi.init({ version: "2.0", sandbox: true });
-
-        async function loginWithPi() {
-            try {
-                const auth = await Pi.authenticate(['username', 'payments'], onIncompletePayment);
-                document.getElementById('login-btn').innerText = auth.user.username;
-            } catch (e) { console.error(e); }
-        }
-
-        async function lipa(jina, bei) {
-            const payment = await Pi.createPayment({
-                amount: bei,
-                memo: "Malipo ya " + jina + " - Samawi Agro",
-                metadata: { item: jina }
-            }, {
-                onReadyForServerApproval: (id) => fetch('/api/pay', {
-                    method: 'POST', 
-                    body: JSON.stringify({ id, action: 'approve' }),
-                    headers: {'Content-Type': 'application/json'}
-                }),
-                onReadyForServerCompletion: (id, txid) => {
-                    alert("Hongera! Umelipa " + bei + " Pi kwa ajili ya " + jina);
-                    fetch('/api/pay', {
-                        method: 'POST', 
-                        body: JSON.stringify({ id, txid, action: 'complete' }),
-                        headers: {'Content-Type': 'application/json'}
-                    });
-                },
-                onCancel: (id) => console.log("Umeghairi"),
-                onError: (e) => alert("Hitilafu imetokea!")
+        function changeView(viewId) {
+            // Ficha views zote
+            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+            // Onyesha view iliyochaguliwa
+            document.getElementById('view-' + viewId).classList.remove('hidden');
+            
+            // Rekebisha rangi za navigation
+            document.querySelectorAll('nav button').forEach(b => {
+                b.classList.remove('nav-active');
+                b.classList.add('text-gray-400');
             });
+            document.getElementById('nav-' + viewId).classList.add('nav-active');
+            document.getElementById('nav-' + viewId).classList.remove('text-gray-400');
         }
-
-        function onIncompletePayment(p) { /* Shughulikia malipo yaliyokwama */ }
     </script>
 </body>
 </html>
