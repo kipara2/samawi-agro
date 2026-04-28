@@ -1,172 +1,82 @@
-// =======================
-// SAMAWI AGRO MAIN SERVER
-// =======================
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Samawi Agro | Real Pi Payments</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
 
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
+    <nav class="bg-green-700 text-white p-4 shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-black">SAMAWI <span class="text-yellow-400">AGRO</span></h1>
+            <button id="login-btn" onclick="loginWithPi()" class="bg-yellow-500 text-green-900 px-5 py-2 rounded-full font-bold">Ingia na Pi</button>
+        </div>
+    </nav>
 
-const app = express();
-app.use(express.json());
-app.use(cors());
+    <main class="container mx-auto p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                <i class="fa-solid fa-cow text-5xl text-green-600 mb-4"></i>
+                <h3 class="text-xl font-bold">Ng'ombe wa Maziwa</h3>
+                <p class="text-gray-500">Aina ya Friesian, Afya bora.</p>
+                <div class="mt-6 flex justify-between items-center">
+                    <span class="text-2xl font-black text-green-700">15.0 Pi</span>
+                    <button onclick="lipa('Ngombe', 15.0)" class="bg-green-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-green-800 transition">Nunua Sasa</button>
+                </div>
+            </div>
 
-// =======================
-// DATABASE CONNECTION
-// =======================
-mongoose.connect("mongodb://127.0.0.1:27017/samawi_agro", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log("Database Connected"))
-.catch(err => console.log(err));
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                <i class="fa-solid fa-seedling text-5xl text-green-600 mb-4"></i>
+                <h3 class="text-xl font-bold">Mahindi (Gunia 1)</h3>
+                <p class="text-gray-500">Mazao mapya kutoka shambani.</p>
+                <div class="mt-6 flex justify-between items-center">
+                    <span class="text-2xl font-black text-green-700">2.5 Pi</span>
+                    <button onclick="lipa('Mahindi', 2.5)" class="bg-green-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-green-800 transition">Nunua Sasa</button>
+                </div>
+            </div>
+        </div>
+    </main>
 
-// =======================
-// MODELS
-// =======================
+    <script>
+        const Pi = window.Pi;
+        Pi.init({ version: "2.0", sandbox: true });
 
-// USER
-const User = mongoose.model("User", {
-  name: String,
-  phone: String,
-  password: String,
-  role: { type: String, default: "buyer" }, // buyer, seller, admin
-});
+        async function loginWithPi() {
+            try {
+                const auth = await Pi.authenticate(['username', 'payments'], onIncompletePayment);
+                document.getElementById('login-btn').innerText = auth.user.username;
+            } catch (e) { console.error(e); }
+        }
 
-// PRODUCT
-const Product = mongoose.model("Product", {
-  name: String,
-  price: Number,
-  description: String,
-  image: String,
-  sellerId: String,
-});
+        async function lipa(jina, bei) {
+            const payment = await Pi.createPayment({
+                amount: bei,
+                memo: "Malipo ya " + jina + " - Samawi Agro",
+                metadata: { item: jina }
+            }, {
+                onReadyForServerApproval: (id) => fetch('/api/pay', {
+                    method: 'POST', 
+                    body: JSON.stringify({ id, action: 'approve' }),
+                    headers: {'Content-Type': 'application/json'}
+                }),
+                onReadyForServerCompletion: (id, txid) => {
+                    alert("Hongera! Umelipa " + bei + " Pi kwa ajili ya " + jina);
+                    fetch('/api/pay', {
+                        method: 'POST', 
+                        body: JSON.stringify({ id, txid, action: 'complete' }),
+                        headers: {'Content-Type': 'application/json'}
+                    });
+                },
+                onCancel: (id) => console.log("Umeghairi"),
+                onError: (e) => alert("Hitilafu imetokea!")
+            });
+        }
 
-// ORDER
-const Order = mongoose.model("Order", {
-  buyerId: String,
-  products: Array,
-  total: Number,
-  status: { type: String, default: "pending" },
-});
-
-// =======================
-// AUTH MIDDLEWARE
-// =======================
-const auth = (req, res, next) => {
-  const token = req.headers["authorization"];
-  if (!token) return res.status(401).send("No token");
-
-  try {
-    const decoded = jwt.verify(token, "SECRET_KEY");
-    req.user = decoded;
-    next();
-  } catch {
-    res.status(401).send("Invalid token");
-  }
-};
-
-// =======================
-// REGISTER
-// =======================
-app.post("/api/register", async (req, res) => {
-  const { name, phone, password } = req.body;
-
-  const hashed = await bcrypt.hash(password, 10);
-
-  const user = new User({
-    name,
-    phone,
-    password: hashed,
-  });
-
-  await user.save();
-  res.send("User created");
-});
-
-// =======================
-// LOGIN
-// =======================
-app.post("/api/login", async (req, res) => {
-  const { phone, password } = req.body;
-
-  const user = await User.findOne({ phone });
-  if (!user) return res.send("User not found");
-
-  const valid = await bcrypt.compare(password, user.password);
-  if (!valid) return res.send("Wrong password");
-
-  const token = jwt.sign(
-    { id: user._id, role: user.role },
-    "SECRET_KEY"
-  );
-
-  res.json({ token });
-});
-
-// =======================
-// ADD PRODUCT (ADMIN ONLY)
-// =======================
-app.post("/api/product", auth, async (req, res) => {
-  if (req.user.role !== "admin")
-    return res.send("Access denied");
-
-  const product = new Product(req.body);
-  await product.save();
-
-  res.send("Product added");
-});
-
-// =======================
-// GET PRODUCTS
-// =======================
-app.get("/api/products", async (req, res) => {
-  const products = await Product.find();
-  res.json(products);
-});
-
-// =======================
-// CREATE ORDER
-// =======================
-app.post("/api/order", auth, async (req, res) => {
-  const order = new Order({
-    buyerId: req.user.id,
-    products: req.body.products,
-    total: req.body.total,
-  });
-
-  await order.save();
-  res.send("Order created");
-});
-
-// =======================
-// PI PAYMENT (READY)
-// =======================
-app.post("/api/pay/pi", auth, async (req, res) => {
-  // HAPA utaunganisha Pi SDK
-  // Step:
-  // 1. Tuma request kwa Pi Wallet
-  // 2. Subiri confirmation
-  // 3. Update order status
-
-  res.send("Pi payment initiated (connect SDK here)");
-});
-
-// =======================
-// ADMIN CHECK
-// =======================
-app.get("/api/admin-check", auth, (req, res) => {
-  if (req.user.role === "admin") {
-    res.send("Welcome Admin");
-  } else {
-    res.send("Not Admin");
-  }
-});
-
-// =======================
-// START SERVER
-// =======================
-app.listen(3000, () => {
-  console.log("Server running on port 3000");
-});
+        function onIncompletePayment(p) { /* Shughulikia malipo yaliyokwama */ }
+    </script>
+</body>
+</html>
