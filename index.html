@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Samawi Agro | Marketplace & Wallet</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
@@ -13,7 +16,7 @@
         .nav-active { color: #6d28d9; border-top: 3px solid #6d28d9; }
         .pi-purple { background-color: #6d28d9; }
         .pi-text-purple { color: #6d28d9; }
-        body { padding-bottom: 90px; background-color: #f9fafb; }
+        body { padding-bottom: 90px; background-color: #f9fafb; overflow-x: hidden; }
         .view { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .hidden { display: none; }
@@ -23,11 +26,8 @@
 
     <header class="bg-white p-4 shadow-sm sticky top-0 z-50 flex justify-between items-center border-b border-purple-100">
         <h1 class="text-xl font-black text-green-700">SAMAWI AGRO</h1>
-        <div class="flex gap-4 text-gray-500">
-            <div class="relative">
-                <i class="fa-solid fa-bell text-xl"></i>
-                <span id="notif-dot" class="absolute -top-1 -right-1 bg-red-500 w-2 h-2 rounded-full hidden"></span>
-            </div>
+        <div class="flex gap-4 text-gray-500 italic text-[10px]">
+            <span id="user-status">Mgeni</span>
             <i class="fa-solid fa-plus-circle text-xl text-purple-600" onclick="changeView('admin')"></i>
         </div>
     </header>
@@ -36,60 +36,50 @@
         
         <section id="view-home" class="view">
             <div class="bg-gradient-to-r from-green-600 to-green-800 rounded-2xl p-6 text-white mb-6 shadow-lg">
-                <p class="text-xs uppercase font-bold opacity-80">Ofa ya Leo</p>
-                <h2 class="text-2xl font-bold">Pata Pembejeo Bora kwa Pi</h2>
+                <p class="text-xs uppercase font-bold opacity-80">Soko la Wakulima</p>
+                <h2 class="text-2xl font-bold">Biashara kwa Pi Network</h2>
             </div>
 
-            <h3 class="font-bold mb-4 italic text-sm">Bidhaa Mpya Sokoni</h3>
+            <h3 class="font-bold mb-4 italic text-sm text-gray-500">Bidhaa Sokoni</h3>
             <div id="product-list" class="grid grid-cols-2 gap-4">
-                <div class="bg-white rounded-xl shadow-sm overflow-hidden border">
-                    <img src="https://images.unsplash.com/photo-1524024973431-2ad916746881?auto=format&fit=crop&w=300" class="w-full h-32 object-cover">
-                    <div class="p-3">
-                        <h4 class="font-bold text-sm">Mbuzi wa Nyama</h4>
-                        <p class="text-green-600 font-black">2.50 Pi</p>
-                        <button onclick="addToCart('Mbuzi', 2.5)" class="w-full mt-2 pi-purple text-white py-2 rounded-lg text-[10px] font-bold">Weka Kapuni</button>
-                    </div>
-                </div>
+                <p class="col-span-2 text-center py-10 text-gray-400">Inapakia bidhaa kutoka database...</p>
             </div>
         </section>
 
         <section id="view-admin" class="view hidden">
             <div class="bg-white p-6 rounded-2xl border shadow-md">
                 <h2 class="text-xl font-bold mb-4 text-purple-700">Ongeza Bidhaa Mpya</h2>
-                
                 <div class="space-y-4">
-                    <div class="flex flex-col items-center border-2 border-dashed border-gray-300 p-4 rounded-xl cursor-pointer" onclick="document.getElementById('img-input').click()">
-                        <i class="fa-solid fa-camera text-3xl text-gray-400"></i>
-                        <span class="text-xs mt-2 text-gray-500">Gusa kuweka picha (Camera/Gallery)</span>
+                    <div class="flex flex-col items-center border-2 border-dashed border-gray-300 p-6 rounded-xl cursor-pointer bg-gray-50" onclick="document.getElementById('img-input').click()">
+                        <i class="fa-solid fa-camera text-4xl text-gray-400"></i>
+                        <span class="text-xs mt-2 text-gray-500">Piga Picha au Chagua Gallery</span>
                         <input type="file" id="img-input" accept="image/*" class="hidden" onchange="previewImage(this)">
-                        <img id="preview-img" class="mt-2 w-32 h-32 object-cover rounded hidden">
+                        <img id="preview-img" class="mt-4 w-full h-40 object-cover rounded-lg hidden border">
                     </div>
-
-                    <input type="text" id="new-p-name" placeholder="Jina la bidhaa" class="w-full p-3 bg-gray-50 border rounded-lg outline-none">
-                    <input type="number" id="new-p-price" placeholder="Bei (Pi)" class="w-full p-3 bg-gray-50 border rounded-lg outline-none">
-                    
-                    <button onclick="saveProduct()" class="w-full bg-green-600 text-white py-4 rounded-xl font-bold shadow-lg">WEKA SOKONI</button>
-                    <button onclick="changeView('home')" class="w-full text-gray-400 text-sm">BATILISHA</button>
+                    <input type="text" id="new-p-name" placeholder="Jina la bidhaa" class="w-full p-3 border rounded-lg outline-none">
+                    <input type="number" id="new-p-price" placeholder="Bei ya Pi" class="w-full p-3 border rounded-lg outline-none">
+                    <button id="save-btn" onclick="saveProduct()" class="w-full bg-green-600 text-white py-4 rounded-xl font-bold shadow-lg uppercase">Weka Sokoni Sasa</button>
+                    <button onclick="changeView('home')" class="w-full text-gray-400 text-sm font-bold">RUDI NYUMA</button>
                 </div>
             </div>
         </section>
 
         <section id="view-cart" class="view hidden">
-            <h2 class="text-xl font-bold mb-4 text-green-700">Kapu la Manunuzi</h2>
+            <h2 class="text-xl font-bold mb-4 text-green-700">Kapu lako</h2>
             <div id="cart-items" class="space-y-3 mb-6"></div>
             <div id="cart-summary" class="bg-white p-4 rounded-xl shadow-md border hidden">
                 <div class="flex justify-between mb-4 font-bold text-lg">
                     <span>Jumla:</span><span id="cart-total" class="text-green-700">0 Pi</span>
                 </div>
-                <button onclick="payWithPi()" class="w-full pi-purple text-white py-4 rounded-xl font-bold shadow-lg">LIPA KWA PI SDK</button>
+                <button onclick="alert('Malipo yanakuja hivi karibuni')" class="w-full pi-purple text-white py-4 rounded-xl font-bold shadow-lg">LIPA KWA PI SDK</button>
             </div>
         </section>
 
         <section id="view-wallet" class="view hidden">
              <div class="bg-white rounded-2xl p-6 shadow-sm border text-center mb-6">
-                <h2 class="text-4xl font-black text-gray-800"><span id="wallet-balance">160.35</span> <span class="text-lg pi-text-purple">Test-Pi</span></h2>
+                <p class="text-xs text-gray-400 mb-2">Salio la Test-Pi</p>
+                <h2 class="text-4xl font-black text-gray-800">160.35 <span class="text-lg pi-text-purple">Pi</span></h2>
             </div>
-            <p class="text-center text-gray-400 text-xs italic">Sehemu ya Wallet inaendelea kuboreshwa...</p>
         </section>
 
     </div>
@@ -99,43 +89,58 @@
             <i class="fa-solid fa-house text-lg"></i><span class="text-[9px] font-bold">HOME</span>
         </button>
         <button onclick="changeView('cart')" id="nav-cart" class="w-1/4 flex flex-col items-center gap-1 text-gray-400 relative">
-            <i class="fa-solid fa-cart-shopping text-lg"></i><span id="cart-count" class="absolute top-1 right-4 bg-red-600 text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold hidden">0</span><span class="text-[9px] font-bold">CART</span>
+            <i class="fa-solid fa-cart-shopping text-lg"></i>
+            <span id="cart-count" class="absolute top-1 right-4 bg-red-600 text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold hidden">0</span>
+            <span class="text-[9px] font-bold">CART</span>
         </button>
         <button onclick="changeView('wallet')" id="nav-wallet" class="w-1/4 flex flex-col items-center gap-1 text-gray-400">
             <i class="fa-solid fa-wallet text-lg"></i><span class="text-[9px] font-bold">WALLET</span>
         </button>
-        <button onclick="alert('Profile inakuja hivi karibuni!')" class="w-1/4 flex flex-col items-center gap-1 text-gray-400">
+        <button onclick="alert('Inakuja hivi karibuni')" class="w-1/4 flex flex-col items-center gap-1 text-gray-400">
             <i class="fa-solid fa-user text-lg"></i><span class="text-[9px] font-bold">PROFILE</span>
         </button>
     </nav>
 
     <script>
+        // FIREBASE CONFIGURATION
+        const firebaseConfig = {
+          apiKey: "AIzaSyAiZD9XLKuotbgj15ePok-R9n1rR8yJNfE",
+          authDomain: "samawi-agro.firebaseapp.com",
+          projectId: "samawi-agro",
+          storageBucket: "samawi-agro.firebasestorage.app",
+          messagingSenderId: "646228762206",
+          appId: "1:646228762206:web:bcfe7149c160f811589ecf",
+          measurementId: "G-KJ41M14M55"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
         const Pi = window.Pi;
         let cart = [];
         let selectedImageData = "";
+        let currentPiUser = "Mgeni";
 
         Pi.init({ version: "2.0" });
 
-        // AUTOMATIC AUTH
-        async function auth() {
+        async function authenticate() {
             try {
-                await Pi.authenticate(['username', 'payments'], (p) => console.log(p));
-            } catch (e) { console.error(e); }
+                const auth = await Pi.authenticate(['username'], (p) => console.log(p));
+                currentPiUser = auth.user.username;
+                document.getElementById('user-status').innerText = "@" + currentPiUser;
+            } catch (e) { console.error("Fungua kwenye Pi Browser"); }
         }
-        window.onload = auth;
+        window.onload = authenticate;
 
         function changeView(viewId) {
-            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+            document.querySelectorAll('section').forEach(v => v.classList.add('hidden'));
             document.getElementById('view-' + viewId).classList.remove('hidden');
-            
             document.querySelectorAll('nav button').forEach(b => b.classList.replace('nav-active', 'text-gray-400'));
-            if(document.getElementById('nav-' + viewId)) {
-                document.getElementById('nav-' + viewId).classList.replace('text-gray-400', 'nav-active');
-            }
+            const activeNav = document.getElementById('nav-' + viewId);
+            if(activeNav) activeNav.classList.replace('text-gray-400', 'nav-active');
             if(viewId === 'cart') renderCart();
         }
 
-        // PREVIEW IMAGE LOGIC
         function previewImage(input) {
             const preview = document.getElementById('preview-img');
             if (input.files && input.files[0]) {
@@ -149,36 +154,59 @@
             }
         }
 
-        // SAVE NEW PRODUCT
-        function saveProduct() {
+        // DATABASE READ: Soma bidhaa kutoka Firebase
+        db.collection("products").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
+            const list = document.getElementById('product-list');
+            list.innerHTML = "";
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                list.innerHTML += `
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden border view">
+                        <img src="${data.image}" class="w-full h-32 object-cover">
+                        <div class="p-3">
+                            <h4 class="font-bold text-sm">${data.name}</h4>
+                            <p class="text-green-600 font-black">${data.price} Pi</p>
+                            <button onclick="addToCart('${data.name}', ${data.price})" class="w-full mt-2 pi-purple text-white py-2 rounded-lg text-[10px] font-bold uppercase">Weka Kapuni</button>
+                        </div>
+                    </div>`;
+            });
+        });
+
+        // DATABASE WRITE: Hifadhi bidhaa kwenye Firebase
+        async function saveProduct() {
             const name = document.getElementById('new-p-name').value;
             const price = document.getElementById('new-p-price').value;
-            const img = selectedImageData || "https://via.placeholder.com/300";
+            const btn = document.getElementById('save-btn');
 
-            if(!name || !price) {
-                alert("Tafadhali jaza jina na bei!");
+            if(!name || !price || !selectedImageData) {
+                alert("Tafadhali jaza jina, bei na weka picha!");
                 return;
             }
 
-            const productHtml = `
-                <div class="bg-white rounded-xl shadow-sm overflow-hidden border view">
-                    <img src="${img}" class="w-full h-32 object-cover">
-                    <div class="p-3">
-                        <h4 class="font-bold text-sm">${name}</h4>
-                        <p class="text-green-600 font-black">${price} Pi</p>
-                        <button onclick="addToCart('${name}', ${price})" class="w-full mt-2 pi-purple text-white py-2 rounded-lg text-[10px] font-bold">Weka Kapuni</button>
-                    </div>
-                </div>`;
-            
-            document.getElementById('product-list').insertAdjacentHTML('afterbegin', productHtml);
-            alert("Bidhaa imewekwa sokoni!");
-            
-            // Clear inputs and return home
-            document.getElementById('new-p-name').value = "";
-            document.getElementById('new-p-price').value = "";
-            document.getElementById('preview-img').classList.add('hidden');
-            selectedImageData = "";
-            changeView('home');
+            btn.disabled = true;
+            btn.innerText = "Inapakia...";
+
+            try {
+                await db.collection("products").add({
+                    name: name,
+                    price: parseFloat(price),
+                    image: selectedImageData,
+                    seller: currentPiUser,
+                    createdAt: new Date()
+                });
+                
+                document.getElementById('new-p-name').value = "";
+                document.getElementById('new-p-price').value = "";
+                document.getElementById('preview-img').classList.add('hidden');
+                selectedImageData = "";
+                
+                alert("Bidhaa imewekwa sokoni!");
+                changeView('home');
+            } catch (e) {
+                alert("Hitilafu imetokea. Hakikisha Firestore imewashwa!");
+            }
+            btn.disabled = false;
+            btn.innerText = "Weka Sokoni Sasa";
         }
 
         function addToCart(name, price) {
@@ -186,26 +214,26 @@
             const countTag = document.getElementById('cart-count');
             countTag.innerText = cart.length;
             countTag.classList.remove('hidden');
-            alert(name + " imewekwa kwenye kapu.");
+            alert(name + " imeongezwa!");
         }
 
         function renderCart() {
             const container = document.getElementById('cart-items');
             const summary = document.getElementById('cart-summary');
             if (cart.length === 0) {
-                container.innerHTML = '<p class="text-center text-gray-400 py-10">Kapu lako ni tupu.</p>';
+                container.innerHTML = '<div class="text-center py-20 text-gray-400"><p>Kapu ni tupu</p></div>';
                 summary.classList.add('hidden');
                 return;
             }
             summary.classList.remove('hidden');
             container.innerHTML = '';
             let total = 0;
-            cart.forEach((item, index) => {
+            cart.forEach((item) => {
                 total += parseFloat(item.price);
                 container.innerHTML += `
-                    <div class="flex justify-between bg-white p-3 rounded-lg border">
-                        <span>${item.name}</span>
-                        <b>${item.price} Pi</b>
+                    <div class="flex justify-between items-center bg-white p-4 rounded-xl border">
+                        <span class="font-bold">${item.name}</span>
+                        <span class="text-green-600 font-black">${item.price} Pi</span>
                     </div>`;
             });
             document.getElementById('cart-total').innerText = total.toFixed(2) + " Pi";
