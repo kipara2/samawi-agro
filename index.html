@@ -1,108 +1,184 @@
 <!DOCTYPE html>
 <html lang="sw">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Samawi Agro</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SAMAWI AGRO</title>
 
-<script src="https://sdk.minepi.com/pi-sdk.js"></script>
+<!-- Tailwind CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
 
 </head>
 
-<body class="p-4">
+<body class="bg-white">
 
-<h1 class="text-xl font-bold">SAMAWI AGRO</h1>
-<p id="user">@guest</p>
-
-<div id="products" class="grid grid-cols-2 gap-4 mt-4"></div>
-
-<h2 class="mt-6 font-bold">Cart</h2>
-<div id="cart"></div>
-<h3 id="total">0 π</h3>
-
-<button onclick="pay()" class="bg-green-600 text-white p-3 mt-3 w-full">
-Lipa na Pi
-</button>
+<div id="app" class="max-w-md mx-auto h-screen flex flex-col"></div>
 
 <script>
-const Pi = window.Pi;
+let view = "soko";
+let walletBalance = 125.75;
 
-let cart = [];
-
-const products = [
- {name:"Mahindi", price:2},
- {name:"Mchele", price:3},
- {name:"Mbolea", price:5}
+let cartItems = [
+  {id:1,name:"Nyanya Fresh",price:0.05,unit:"kg",quantity:3,image:"https://images.unsplash.com/photo-1774173822458-2a45e722ae5f"},
+  {id:2,name:"Karoti Organic",price:0.08,unit:"kg",quantity:2,image:"https://images.unsplash.com/photo-1741518359356-623aa8385826"},
+  {id:3,name:"Mboga Mchanganyiko",price:0.12,unit:"pkt",quantity:1,image:"https://images.unsplash.com/photo-1694825588875-190db201a997"}
 ];
 
-// LOAD PRODUCTS
-const container = document.getElementById("products");
-products.forEach(p=>{
- container.innerHTML += `
- <div class="border p-2">
-   <h4>${p.name}</h4>
-   <p>${p.price} π</p>
-   <button onclick="add('${p.name}',${p.price})">Add</button>
- </div>`;
-});
+const products = [
+  {id:1,name:"Nyanya Fresh",price:0.05,unit:"kg",image:"https://images.unsplash.com/photo-1774173822458-2a45e722ae5f"},
+  {id:2,name:"Karoti Organic",price:0.08,unit:"kg",image:"https://images.unsplash.com/photo-1741518359356-623aa8385826"},
+  {id:3,name:"Mboga Mchanganyiko",price:0.12,unit:"pkt",image:"https://images.unsplash.com/photo-1694825588875-190db201a997"}
+];
 
-function add(n,p){
- cart.push({n,p});
- render();
+// ---------------- FUNCTIONS ----------------
+function addToCart(id){
+  let p = products.find(x=>x.id===id);
+  let existing = cartItems.find(x=>x.id===id);
+
+  if(existing){
+    existing.quantity++;
+  }else{
+    cartItems.push({...p,quantity:1});
+  }
+  render();
 }
 
+function updateQty(id,delta){
+  cartItems = cartItems.map(i=>{
+    if(i.id===id){
+      i.quantity = Math.max(1,i.quantity+delta);
+    }
+    return i;
+  });
+  render();
+}
+
+function removeItem(id){
+  cartItems = cartItems.filter(i=>i.id!==id);
+  render();
+}
+
+function total(){
+  return cartItems.reduce((s,i)=>s+i.price*i.quantity,0).toFixed(2);
+}
+
+// ---------------- UI ----------------
 function render(){
- let t=0;
- const c=document.getElementById("cart");
- c.innerHTML="";
- cart.forEach(i=>{
-  t+=i.p;
-  c.innerHTML+=`<p>${i.n} - ${i.p}</p>`;
- });
- document.getElementById("total").innerText=t+" π";
+
+let html = "";
+
+// ================= SOKO =================
+if(view==="soko"){
+html = `
+<header class="bg-green-700 text-white p-4 text-center font-bold text-xl">
+SOKO LA SAMAWI
+</header>
+
+<div class="p-2">
+<input class="w-full border p-2 rounded" placeholder="Tafuta bidhaa..."/>
+</div>
+
+<div class="grid grid-cols-2 gap-2 p-2">
+${products.map(p=>`
+<div class="border rounded p-2">
+<img src="${p.image}" class="h-24 w-full object-cover rounded"/>
+<p class="font-bold">${p.name}</p>
+<p class="text-green-700">π${p.price}</p>
+<button onclick="addToCart(${p.id})" class="bg-yellow-600 text-white w-full mt-1 p-1 rounded">
+Ongeza
+</button>
+</div>
+`).join("")}
+</div>
+
+<footer class="mt-auto flex justify-around p-3 border-t">
+<button onclick="setView('soko')">Soko</button>
+<button onclick="setView('cart')">Cart (${cartItems.length})</button>
+<button onclick="setView('wallet')">Wallet</button>
+</footer>
+`;
 }
 
-// PI LOGIN
-window.onload=async()=>{
- Pi.init({version:"2.0"});
- const auth=await Pi.authenticate(['username'],()=>{});
- document.getElementById("user").innerText="@"+auth.user.username;
+// ================= CART =================
+if(view==="cart"){
+html = `
+<header class="bg-green-700 text-white p-4 text-center font-bold text-xl">
+KIKAPU CHANGU
+</header>
+
+<div class="p-2">
+${cartItems.map(i=>`
+<div class="border p-2 mb-2 flex gap-2">
+<img src="${i.image}" class="w-16 h-16 object-cover"/>
+<div class="flex-1">
+<p>${i.name}</p>
+<p class="text-green-700">π${i.price}</p>
+
+<div class="flex gap-2 items-center">
+<button onclick="updateQty(${i.id},-1)">-</button>
+<span>${i.quantity}</span>
+<button onclick="updateQty(${i.id},1)">+</button>
+</div>
+
+<p>Total: π${(i.price*i.quantity).toFixed(2)}</p>
+</div>
+
+<button onclick="removeItem(${i.id})">X</button>
+</div>
+`).join("")}
+
+<h2 class="font-bold">Jumla: π${total()}</h2>
+</div>
+
+<footer class="mt-auto flex justify-around p-3 border-t">
+<button onclick="setView('soko')">Soko</button>
+<button onclick="setView('cart')">Cart</button>
+<button onclick="setView('wallet')">Wallet</button>
+</footer>
+`;
 }
 
-// PAYMENT
-async function pay(){
- const total=parseFloat(document.getElementById("total").innerText);
+// ================= WALLET =================
+if(view==="wallet"){
+html = `
+<header class="bg-blue-900 text-white p-4 text-center font-bold text-xl">
+POCHI YANGU
+</header>
 
- await Pi.createPayment({
-  amount: total,
-  memo: "Samawi Agro",
-  metadata: {items: cart}
- },{
-  onReadyForServerApproval: async (paymentId)=>{
-    await fetch("http://localhost:3000/approve",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({paymentId})
-    });
-  },
+<div class="p-4 text-center">
+<h1 class="text-3xl font-bold">π${walletBalance}</h1>
+<p>Salio Lako</p>
 
-  onReadyForServerCompletion: async (paymentId, txid)=>{
-    await fetch("http://localhost:3000/complete",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({paymentId, txid})
-    });
+<div class="mt-4">
+<button class="bg-yellow-500 p-2 w-full mb-2">Ongeza</button>
+<button class="bg-yellow-500 p-2 w-full">Tuma</button>
+</div>
+</div>
 
-    alert("Malipo yamefanikiwa!");
-    cart=[];
-    render();
-  },
-
-  onCancel: ()=>alert("Cancelled"),
-  onError: err=>alert(err.message)
- });
+<footer class="mt-auto flex justify-around p-3 border-t">
+<button onclick="setView('soko')">Soko</button>
+<button onclick="setView('cart')">Cart</button>
+<button onclick="setView('wallet')">Wallet</button>
+</footer>
+`;
 }
+
+document.getElementById("app").innerHTML = html;
+lucide.createIcons();
+}
+
+// ---------------- CHANGE VIEW ----------------
+function setView(v){
+view = v;
+render();
+}
+
+// first render
+render();
+
 </script>
 
 </body>
