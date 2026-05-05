@@ -1,183 +1,300 @@
 <!DOCTYPE html>
 <html lang="sw">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>SAMAWI AGRO</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- Tailwind CDN -->
+<title>Samawi Agro</title>
+
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://kit.fontawesome.com/a2d9d6a05b.js"></script>
 
-<!-- Lucide Icons -->
-<script src="https://unpkg.com/lucide@latest"></script>
+<!-- PI SDK -->
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
 
 </head>
 
-<body class="bg-white">
+<body class="bg-gray-100">
 
-<div id="app" class="max-w-md mx-auto h-screen flex flex-col"></div>
+<div class="max-w-md mx-auto bg-white min-h-screen flex flex-col">
 
-<script>
-let view = "soko";
-let walletBalance = 125.75;
-
-let cartItems = [
-  {id:1,name:"Nyanya Fresh",price:0.05,unit:"kg",quantity:3,image:"https://images.unsplash.com/photo-1774173822458-2a45e722ae5f"},
-  {id:2,name:"Karoti Organic",price:0.08,unit:"kg",quantity:2,image:"https://images.unsplash.com/photo-1741518359356-623aa8385826"},
-  {id:3,name:"Mboga Mchanganyiko",price:0.12,unit:"pkt",quantity:1,image:"https://images.unsplash.com/photo-1694825588875-190db201a997"}
-];
-
-const products = [
-  {id:1,name:"Nyanya Fresh",price:0.05,unit:"kg",image:"https://images.unsplash.com/photo-1774173822458-2a45e722ae5f"},
-  {id:2,name:"Karoti Organic",price:0.08,unit:"kg",image:"https://images.unsplash.com/photo-1741518359356-623aa8385826"},
-  {id:3,name:"Mboga Mchanganyiko",price:0.12,unit:"pkt",image:"https://images.unsplash.com/photo-1694825588875-190db201a997"}
-];
-
-// ---------------- FUNCTIONS ----------------
-function addToCart(id){
-  let p = products.find(x=>x.id===id);
-  let existing = cartItems.find(x=>x.id===id);
-
-  if(existing){
-    existing.quantity++;
-  }else{
-    cartItems.push({...p,quantity:1});
-  }
-  render();
-}
-
-function updateQty(id,delta){
-  cartItems = cartItems.map(i=>{
-    if(i.id===id){
-      i.quantity = Math.max(1,i.quantity+delta);
-    }
-    return i;
-  });
-  render();
-}
-
-function removeItem(id){
-  cartItems = cartItems.filter(i=>i.id!==id);
-  render();
-}
-
-function total(){
-  return cartItems.reduce((s,i)=>s+i.price*i.quantity,0).toFixed(2);
-}
-
-// ---------------- UI ----------------
-function render(){
-
-let html = "";
-
-// ================= SOKO =================
-if(view==="soko"){
-html = `
-<header class="bg-green-700 text-white p-4 text-center font-bold text-xl">
-SOKO LA SAMAWI
+<!-- HEADER -->
+<header class="bg-green-700 text-white text-center py-4">
+    <h1 class="text-xl font-bold">SAMAWI AGRO 🌱</h1>
+    <p class="text-xs">Soko la Wakulima Tanzania</p>
 </header>
 
-<div class="p-2">
-<input class="w-full border p-2 rounded" placeholder="Tafuta bidhaa..."/>
+<!-- SEARCH -->
+<div class="p-3 bg-green-700">
+    <input id="search" placeholder="Tafuta bidhaa..." class="w-full p-2 rounded outline-none">
 </div>
 
-<div class="grid grid-cols-2 gap-2 p-2">
-${products.map(p=>`
-<div class="border rounded p-2">
-<img src="${p.image}" class="h-24 w-full object-cover rounded"/>
-<p class="font-bold">${p.name}</p>
-<p class="text-green-700">π${p.price}</p>
-<button onclick="addToCart(${p.id})" class="bg-yellow-600 text-white w-full mt-1 p-1 rounded">
-Ongeza
+<!-- MAIN -->
+<main class="flex-1 overflow-y-auto">
+
+<!-- HOME -->
+<div id="home-view" class="p-3">
+    <h2 class="font-bold mb-2">Karibu Samawi Agro</h2>
+    <p class="text-sm text-gray-600">
+        Nunua au uza moja kwa moja 🌱
+    </p>
+
+    <button onclick="loginWithPi()" class="mt-3 bg-black text-white w-full py-2 rounded">
+        Login na Pi
+    </button>
+</div>
+
+<!-- SOKO -->
+<div id="soko-view" class="p-3 hidden">
+
+<div class="flex gap-2 overflow-x-auto mb-3">
+
+<button onclick="filterCategory('All')" class="px-3 py-1 bg-gray-200 rounded">Zote</button>
+<button onclick="filterCategory('Mazao')" class="px-3 py-1 bg-green-200 rounded">Mazao</button>
+<button onclick="filterCategory('Mifugo')" class="px-3 py-1 bg-yellow-200 rounded">Mifugo</button>
+<button onclick="filterCategory('Vifaa')" class="px-3 py-1 bg-blue-200 rounded">Vifaa</button>
+
+</div>
+
+<div id="product-grid" class="grid grid-cols-2 gap-3"></div>
+
+</div>
+
+<!-- CART -->
+<div id="cart-view" class="p-3 hidden">
+    <h2 class="font-bold mb-3">Kikapu</h2>
+    <div id="cart-items"></div>
+
+    <button onclick="checkout()" class="bg-green-600 text-white w-full py-2 mt-4 rounded">
+        LIPA NA PI 💰
+    </button>
+</div>
+
+<!-- WALLET -->
+<div id="wallet-view" class="p-3 hidden text-center">
+    <h2 class="font-bold mb-3">Wallet</h2>
+    <p class="text-3xl">π 120.00</p>
+</div>
+
+<!-- PROFILE -->
+<div id="profile-view" class="p-3 hidden text-center">
+
+<h2 class="font-bold mb-3">Profile</h2>
+
+<p id="user-info"></p>
+
+<button id="add-product-btn" onclick="showView('add')" 
+class="bg-green-600 text-white w-full py-2 rounded hidden">
+Ongeza Bidhaa
 </button>
-</div>
-`).join("")}
+
 </div>
 
-<footer class="mt-auto flex justify-around p-3 border-t">
-<button onclick="setView('soko')">Soko</button>
-<button onclick="setView('cart')">Cart (${cartItems.length})</button>
-<button onclick="setView('wallet')">Wallet</button>
-</footer>
-`;
+<!-- ADD PRODUCT -->
+<div id="add-view" class="p-3 hidden">
+
+<h2 class="font-bold mb-3">Ongeza Bidhaa</h2>
+
+<input id="name" placeholder="Jina" class="w-full p-2 border mb-2">
+<input id="price" placeholder="Bei" class="w-full p-2 border mb-2">
+<input id="unit" placeholder="Unit" class="w-full p-2 border mb-2">
+<input id="img" placeholder="Image URL" class="w-full p-2 border mb-2">
+
+<select id="category" class="w-full p-2 border mb-2">
+<option value="">Category</option>
+<option value="Mazao">Mazao</option>
+<option value="Mifugo">Mifugo</option>
+<option value="Vifaa">Vifaa</option>
+</select>
+
+<select id="subcategory" class="w-full p-2 border mb-2"></select>
+
+<button onclick="addProduct()" class="bg-green-700 text-white w-full py-2 rounded">
+HIFADHI
+</button>
+
+</div>
+
+</main>
+
+<!-- NAV -->
+<nav class="flex justify-around p-3 border-t bg-white text-xs">
+
+<button onclick="showView('home')"><i class="fa fa-home"></i><br>Home</button>
+<button onclick="showView('soko')"><i class="fa fa-store"></i><br>Soko</button>
+<button onclick="showView('cart')"><i class="fa fa-cart-plus"></i><br>Cart</button>
+<button onclick="showView('wallet')"><i class="fa fa-wallet"></i><br>Wallet</button>
+<button onclick="showView('profile')"><i class="fa fa-user"></i><br>Profile</button>
+
+</nav>
+
+</div>
+
+<!-- FIREBASE -->
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "YOUR_KEY",
+  authDomain: "samawi-agro-b0f27.firebaseapp.com",
+  projectId: "samawi-agro-b0f27"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+/* PI INIT */
+const Pi = window.Pi;
+Pi.init({ version: "2.0", sandbox: true });
+
+/* USER */
+let user = { role: "buyer", paid: false, name: "Guest" };
+
+/* LOGIN PI */
+window.loginWithPi = async function(){
+    const auth = await Pi.authenticate(['username','payments']);
+    user.name = auth.user.username;
+
+    document.getElementById("user-info").innerText = "User: " + user.name;
+    alert("Karibu " + user.name);
 }
 
-// ================= CART =================
-if(view==="cart"){
-html = `
-<header class="bg-green-700 text-white p-4 text-center font-bold text-xl">
-KIKAPU CHANGU
-</header>
+/* SUBCATEGORIES */
+const subcategories = {
+    Mazao: ["Mahindi","Mpunga","Maharage","Ndizi","Viazi"],
+    Mifugo: ["Ng'ombe","Mbuzi","Kuku","Kondoo"],
+    Vifaa: ["Trekta","Jembe","Mbegu","Pampu"]
+};
 
-<div class="p-2">
-${cartItems.map(i=>`
-<div class="border p-2 mb-2 flex gap-2">
-<img src="${i.image}" class="w-16 h-16 object-cover"/>
-<div class="flex-1">
-<p>${i.name}</p>
-<p class="text-green-700">π${i.price}</p>
+document.getElementById("category").addEventListener("change", function(){
+    const sub = document.getElementById("subcategory");
+    sub.innerHTML = "";
 
-<div class="flex gap-2 items-center">
-<button onclick="updateQty(${i.id},-1)">-</button>
-<span>${i.quantity}</span>
-<button onclick="updateQty(${i.id},1)">+</button>
-</div>
+    subcategories[this.value]?.forEach(s=>{
+        sub.innerHTML += `<option value="${s}">${s}</option>`;
+    });
+});
 
-<p>Total: π${(i.price*i.quantity).toFixed(2)}</p>
-</div>
+/* DATA */
+let cart = [];
+let allProducts = [];
 
-<button onclick="removeItem(${i.id})">X</button>
-</div>
-`).join("")}
+/* LOAD */
+const grid = document.getElementById("product-grid");
 
-<h2 class="font-bold">Jumla: π${total()}</h2>
-</div>
+async function loadProducts(){
+    const snap = await getDocs(collection(db,"products"));
 
-<footer class="mt-auto flex justify-around p-3 border-t">
-<button onclick="setView('soko')">Soko</button>
-<button onclick="setView('cart')">Cart</button>
-<button onclick="setView('wallet')">Wallet</button>
-</footer>
-`;
+    allProducts = [];
+
+    snap.forEach(d=>{
+        allProducts.push(d.data());
+    });
+
+    display(allProducts);
+}
+loadProducts();
+
+/* DISPLAY */
+function display(products){
+    grid.innerHTML="";
+
+    products.forEach(p=>{
+        const div = document.createElement("div");
+
+        div.className="bg-white shadow p-2 rounded text-center";
+
+        div.innerHTML=`
+        <img src="${p.img}" class="h-24 w-full object-cover mb-2">
+        <h3 class="font-bold text-sm">${p.name}</h3>
+        <p class="text-xs">${p.category} • ${p.subcategory}</p>
+        <p class="text-green-700 text-xs">π${p.price}</p>
+
+        <button class="bg-yellow-600 text-white w-full mt-2 py-1 text-xs rounded">
+        ONGEZA
+        </button>
+        `;
+
+        div.querySelector("button").onclick=()=>addToCart(p);
+
+        grid.appendChild(div);
+    });
 }
 
-// ================= WALLET =================
-if(view==="wallet"){
-html = `
-<header class="bg-blue-900 text-white p-4 text-center font-bold text-xl">
-POCHI YANGU
-</header>
-
-<div class="p-4 text-center">
-<h1 class="text-3xl font-bold">π${walletBalance}</h1>
-<p>Salio Lako</p>
-
-<div class="mt-4">
-<button class="bg-yellow-500 p-2 w-full mb-2">Ongeza</button>
-<button class="bg-yellow-500 p-2 w-full">Tuma</button>
-</div>
-</div>
-
-<footer class="mt-auto flex justify-around p-3 border-t">
-<button onclick="setView('soko')">Soko</button>
-<button onclick="setView('cart')">Cart</button>
-<button onclick="setView('wallet')">Wallet</button>
-</footer>
-`;
+/* FILTER */
+window.filterCategory=function(c){
+    if(c==="All") display(allProducts);
+    else display(allProducts.filter(p=>p.category===c));
 }
 
-document.getElementById("app").innerHTML = html;
-lucide.createIcons();
+/* CART */
+window.addToCart=function(p){
+    cart.push(p);
+    updateCart();
 }
 
-// ---------------- CHANGE VIEW ----------------
-function setView(v){
-view = v;
-render();
+function updateCart(){
+    const c=document.getElementById("cart-items");
+    c.innerHTML="";
+
+    cart.forEach(i=>{
+        c.innerHTML+=`<div class="flex justify-between border-b py-2">
+        <span>${i.name}</span><span>π${i.price}</span></div>`;
+    });
 }
 
-// first render
-render();
+/* PI PAYMENT */
+window.checkout = async function(){
+
+    if(cart.length===0) return alert("Cart tupu");
+
+    let total = cart.reduce((a,b)=>a+Number(b.price),0);
+
+    await Pi.createPayment({
+        amount: total,
+        memo: "Samawi Agro Order"
+    });
+
+    await addDoc(collection(db,"orders"),{
+        items:cart,
+        total,
+        date:new Date()
+    });
+
+    alert("Imelipwa kupitia Pi 💰");
+
+    cart=[];
+    updateCart();
+}
+
+/* ADD PRODUCT */
+window.addProduct = async function(){
+
+    if(user.role!=="seller"){
+        alert("Unahitaji kuwa seller");
+        return;
+    }
+
+    await addDoc(collection(db,"products"),{
+        name: name.value,
+        price: price.value,
+        unit: unit.value,
+        img: img.value,
+        category: category.value,
+        subcategory: subcategory.value
+    });
+
+    alert("Imeongezwa");
+    loadProducts();
+}
+
+/* NAV */
+window.showView=function(v){
+    document.querySelectorAll("main>div").forEach(d=>d.classList.add("hidden"));
+    document.getElementById(v+"-view").classList.remove("hidden");
+}
 
 </script>
 
